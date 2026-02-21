@@ -1,71 +1,24 @@
-// amebo-naija/
-// ├── public/
-// │   └── index.html
-// ├── src/
-// │   ├── assets/
-// │   │   └── logo.png
-// │   │
-// │   ├── components/          
-// │   │   ├── Navbar.jsx           
-// │   │   ├── Footer.jsx           
-// │   │   ├── PostCard.jsx         
-// │   │   ├── CategoryBadge.jsx    
-// │   │   └── Spinner.jsx          
-// │   │
-// │   ├── pages/               
-// │   │   ├── Home.jsx             
-// │   │   ├── SinglePost.jsx       
-// │   │   ├── Category.jsx         
-// │   │   ├── Search.jsx           
-// │   │   ├── Login.jsx            
-// │   │   ├── Register.jsx         
-// │   │   └── dashboard/           
-// │   │       ├── Dashboard.jsx    
-// │   │       ├── CreatePost.jsx   
-// │   │       ├── MyPosts.jsx      
-// │   │       └── PendingPosts.jsx 
-// │   │
-// │   ├── context/             
-// │   │   └── AuthContext.jsx      
-// │   │
-// │   ├── api/                 
-// │   │   └── axios.js         done    
-// │   │
-// │   ├── App.jsx
-// │   ├── main.jsx
-// │   └── index.css
-// ├── .env
-// └── package.json
 
-```
-
-- **@reduxjs/toolkit** — the modern way to use Redux (simpler, less code)
-- **react-redux** — connects Redux to your React components
-
----
-
-Your updated folder structure with Redux:
-```
 // src/
 // ├── assets/
-// │   └── logo.png
+// │   └── logo.png done
 // │
 // ├── components/          
-// │   ├── Navbar.jsx           
-// │   ├── Footer.jsx           
-// │   ├── PostCard.jsx         
+// │   ├── Navbar.jsx         done  
+// │   ├── Footer.jsx           done
+// │   ├── PostCard.jsx         done
 // │   ├── CategoryBadge.jsx    
-// │   └── Spinner.jsx          
+// │   └── Spinner.jsx          done
 // │
 // ├── pages/               
-// │   ├── Home.jsx             
-// │   ├── SinglePost.jsx       
+// │   ├── Home.jsx           done  
+// │   ├── SinglePost.jsx       done
 // │   ├── Category.jsx         
 // │   ├── Search.jsx           
-// │   ├── Login.jsx            
-// │   ├── Register.jsx         
+// │   ├── Login.jsx          done  
+// │   ├── Register.jsx         done
 // │   └── dashboard/           
-// │       ├── Dashboard.jsx    
+// │       ├── Dashboard.jsx    done
 // │       ├── CreatePost.jsx   
 // │       ├── MyPosts.jsx      
 // │       └── PendingPosts.jsx 
@@ -73,11 +26,11 @@ Your updated folder structure with Redux:
 // ├── store/                    
 // │   ├── store.js              
 // │   └── slices/
-// │       ├── authSlice.js      
-// │       └── postSlice.js      
+// │       ├── authSlice.js      done
+// │       └── postSlice.js      done
 // │
 // ├── api/                 
-// │   └── axios.js             
+// │   └── axios.js          done   
 // │
 // ├── App.jsx
 // ├── main.jsx

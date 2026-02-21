@@ -1,0 +1,27 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --green: #006400;
+    --gold: #FFB800;
+    --red: #CC0000;
+    --bg: #F9F9F9;
+    --text: #1A1A1A;
+    --light-green: #E8F5E9;
+    --gray: #666666;
+    --border: #E0E0E0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
