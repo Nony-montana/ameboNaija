@@ -5,6 +5,8 @@ import API from "../../api/axios";
 import Spinner from "../../components/Spinner";
 import MessageToast from "../../components/ui/MessageToast";
 import { FaEye, FaEdit, FaTrash, FaClock } from "react-icons/fa";
+import { TfiWrite } from "react-icons/tfi";
+import { IoNewspaper } from "react-icons/io5";
 
 const MyPosts = () => {
     const { isLoggedIn } = useSelector((state) => state.auth);
@@ -70,7 +72,7 @@ const MyPosts = () => {
                 {/* HEADER */}
                 <div className="d-flex align-items-center justify-content-between mb-4">
                     <div>
-                        <h4 className="fw-bold mb-0">📝 My Posts</h4>
+                        <h4 className="fw-bold mb-0"><IoNewspaper/> My Posts</h4>
                         <p style={{ color: "var(--gray)", fontSize: "14px" }}>
                             Manage all your articles and gist
                         </p>
@@ -94,7 +96,7 @@ const MyPosts = () => {
                 {/* EMPTY STATE */}
                 {posts.length === 0 && !loading && (
                     <div className="text-center p-5 bg-white rounded shadow-sm">
-                        <p style={{ fontSize: "40px" }}>✍️</p>
+                        <p style={{ fontSize: "40px" }}><TfiWrite/></p>
                         <h6 className="fw-bold">No posts yet!</h6>
                         <p style={{ color: "var(--gray)", fontSize: "14px" }}>
                             You haven't written any posts yet. Start sharing your gist!
