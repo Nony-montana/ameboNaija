@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import API from "../api/axios";
 import { loginSuccess } from "../store/slices/authSlice";
 import { FaEye, FaEyeSlash, FaSignInAlt } from "react-icons/fa";
-import logo from "../assets/logo.png";
+import logo from "../assets/Logo.png";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import MessageToast from "../components/ui/MessageToast";

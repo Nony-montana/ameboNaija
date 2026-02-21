@@ -4,7 +4,7 @@ import { logout } from "../store/slices/authSlice";
 import { FaSearch, FaUserCircle, FaPen } from "react-icons/fa";
 import { MdDashboard, MdLogout } from "react-icons/md";
 import { useState } from "react";
-import logo from "../assets/logo.png";
+import logo from "../assets/Logo.png";
 
 const Navbar = () => {
   const { isLoggedIn, user } = useSelector((state) => state.auth);
