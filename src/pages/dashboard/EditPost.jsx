@@ -17,6 +17,8 @@ const EditPost = () => {
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("");
     const [imagePreview, setImagePreview] = useState(null);
+    const { user } = useSelector((state) => state.auth);
+
 
     // Redirect if not logged in
     useEffect(() => {
