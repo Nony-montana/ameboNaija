@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { useEffect } from "react";
 import API from "../../api/axios";
 import MessageToast from "../../components/ui/MessageToast";
 import { FaPen, FaImage } from "react-icons/fa";
@@ -15,11 +14,36 @@ const CreatePost = () => {
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("");
     const [imagePreview, setImagePreview] = useState(null);
+    const [base64Image, setBase64Image] = useState("");
 
-    // Redirect if not logged in
     useEffect(() => {
         if (!isLoggedIn) navigate("/login");
     }, [isLoggedIn]);
+
+    // Convert image file to base64
+    const convertToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (error) => reject(error);
+        });
+    };
+
+    const handleImageChange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Check file size - max 5MB
+            if (file.size > 5 * 1024 * 1024) {
+                setMessage("Image size must be less than 5MB");
+                setMessageType("error");
+                return;
+            }
+            const base64 = await convertToBase64(file);
+            setBase64Image(base64);
+            setImagePreview(base64);
+        }
+    };
 
     const formik = useFormik({
         initialValues: {
@@ -28,12 +52,14 @@ const CreatePost = () => {
             category: "",
             tags: "",
             status: "draft",
-            image: null,
         },
 
         validationSchema: yup.object({
             title: yup.string().required("Title is required"),
-            content: yup.string().required("Content is required").min(50, "Content must be at least 50 characters"),
+            content: yup
+                .string()
+                .required("Content is required")
+                .min(50, "Content must be at least 50 characters"),
             category: yup.string().required("Category is required"),
             status: yup.string().required("Status is required"),
         }),
@@ -42,32 +68,29 @@ const CreatePost = () => {
             setLoading(true);
             setMessage("");
             try {
-                // Use FormData because we're uploading an image
-                const formData = new FormData();
-                formData.append("title", values.title);
-                formData.append("content", values.content);
-                formData.append("category", values.category);
-                formData.append("status", values.status);
+                // Convert tags string to array
+                const tagsArray = values.tags
+                    ? values.tags.split(",").map((t) => t.trim()).filter(Boolean)
+                    : [];
 
-                // Convert tags string "davido, wizkid, music" into array
-                if (values.tags) {
-                    const tagsArray = values.tags.split(",").map((t) => t.trim());
-                    tagsArray.forEach((tag) => formData.append("tags[]", tag));
-                }
+                // Send as regular JSON now, no FormData needed
+                const payload = {
+                    title: values.title,
+                    content: values.content,
+                    category: values.category,
+                    status: values.status,
+                    tags: tagsArray,
+                    image: base64Image || "",
+                };
 
-                if (values.image) {
-                    formData.append("image", values.image);
-                }
+                await API.post("/posts", payload);
 
-                await API.post("/posts", formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
-
-                setMessage("Post created successfully! It will be reviewed by an admin before publishing 🎉");
+                setMessage("Post created successfully! It will be reviewed by an admin before publishing.");
                 setMessageType("success");
                 setTimeout(() => navigate("/dashboard/my-posts"), 2000);
 
             } catch (err) {
+                console.log("Error:", err.response?.data);
                 setMessage(err.response?.data?.message || "Failed to create post");
                 setMessageType("error");
             } finally {
@@ -75,14 +98,6 @@ const CreatePost = () => {
             }
         },
     });
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            formik.setFieldValue("image", file);
-            setImagePreview(URL.createObjectURL(file));
-        }
-    };
 
     return (
         <div style={{ backgroundColor: "var(--bg)", minHeight: "100vh" }}>
@@ -153,7 +168,7 @@ const CreatePost = () => {
                                 >
                                     <option value="">Select a category</option>
                                     {["news", "gist", "gossip", "entertainment", "lifestyle"].map((cat) => (
-                                        <option key={cat} value={cat} className="text-capitalize">
+                                        <option key={cat} value={cat}>
                                             {cat.charAt(0).toUpperCase() + cat.slice(1)}
                                         </option>
                                     ))}
@@ -182,7 +197,10 @@ const CreatePost = () => {
                         {/* TAGS */}
                         <div className="mb-3">
                             <label className="form-label fw-semibold" style={{ fontSize: "13px" }}>
-                                Tags <span style={{ color: "var(--gray)", fontWeight: "400" }}>(optional — separate with commas)</span>
+                                Tags{" "}
+                                <span style={{ color: "var(--gray)", fontWeight: "400" }}>
+                                    (optional — separate with commas)
+                                </span>
                             </label>
                             <input
                                 type="text"
@@ -198,12 +216,13 @@ const CreatePost = () => {
                         {/* IMAGE UPLOAD */}
                         <div className="mb-3">
                             <label className="form-label fw-semibold" style={{ fontSize: "13px" }}>
-                                Cover Image <span style={{ color: "var(--gray)", fontWeight: "400" }}>(optional)</span>
+                                Cover Image{" "}
+                                <span style={{ color: "var(--gray)", fontWeight: "400" }}>(optional, max 5MB)</span>
                             </label>
 
                             {/* IMAGE PREVIEW */}
                             {imagePreview && (
-                                <div className="mb-2">
+                                <div className="mb-2 position-relative">
                                     <img
                                         src={imagePreview}
                                         alt="preview"
@@ -215,6 +234,18 @@ const CreatePost = () => {
                                             border: "1px solid var(--border)"
                                         }}
                                     />
+                                    {/* REMOVE IMAGE BUTTON */}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setImagePreview(null);
+                                            setBase64Image("");
+                                        }}
+                                        className="btn btn-sm position-absolute top-0 end-0 m-2"
+                                        style={{ backgroundColor: "var(--red)", color: "white", fontSize: "11px" }}
+                                    >
+                                        Remove
+                                    </button>
                                 </div>
                             )}
 
@@ -231,14 +262,14 @@ const CreatePost = () => {
                                 <div className="text-center">
                                     <FaImage size={24} color="var(--green)" />
                                     <p className="mb-0 mt-2" style={{ fontSize: "13px", color: "var(--gray)" }}>
-                                        Click to upload image (JPG, PNG, WEBP)
+                                        {imagePreview ? "Click to change image" : "Click to upload image (JPG, PNG, WEBP)"}
                                     </p>
                                 </div>
                             </div>
                             <input
                                 type="file"
                                 id="imageInput"
-                                accept="image/*"
+                                accept="image/jpeg, image/png, image/webp"
                                 style={{ display: "none" }}
                                 onChange={handleImageChange}
                             />

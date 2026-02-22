@@ -7,6 +7,8 @@ import MessageToast from "../../components/ui/MessageToast";
 import { FaEye, FaEdit, FaTrash, FaClock } from "react-icons/fa";
 import { TfiWrite } from "react-icons/tfi";
 import { IoNewspaper } from "react-icons/io5";
+import { TbTrash } from "react-icons/tb";
+import { BiInfoCircle } from "react-icons/bi";
 
 const MyPosts = () => {
     const { isLoggedIn } = useSelector((state) => state.auth);
@@ -15,13 +17,14 @@ const MyPosts = () => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("");
+    const [deleteSlug, setDeleteSlug] = useState(null);     // stores slug of post to delete
+    const [deleteTitle, setDeleteTitle] = useState("");     // stores title for display in modal
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
-    // Redirect if not logged in
     useEffect(() => {
         if (!isLoggedIn) navigate("/login");
     }, [isLoggedIn]);
 
-    // Fetch my posts
     useEffect(() => {
         const fetchMyPosts = async () => {
             setLoading(true);
@@ -38,21 +41,32 @@ const MyPosts = () => {
         fetchMyPosts();
     }, []);
 
-    // Delete post
-    const handleDelete = async (slug) => {
-        if (!window.confirm("Are you sure you want to delete this post?")) return;
+    // Open modal - just save the slug and title
+    const openDeleteModal = (slug, title) => {
+        setDeleteSlug(slug);
+        setDeleteTitle(title);
+    };
+
+    // Confirm delete from modal
+    const handleDelete = async () => {
+        setDeleteLoading(true);
         try {
-            await API.delete(`/posts/${slug}`);
-            setPosts(posts.filter((p) => p.slug !== slug));
+            await API.delete(`/posts/${deleteSlug}`);
+            setPosts(posts.filter((p) => p.slug !== deleteSlug));
             setMessage("Post deleted successfully");
             setMessageType("success");
+            setDeleteSlug(null);
+            setDeleteTitle("");
+            // Close modal programmatically
+            document.getElementById("closeDeleteModal").click();
         } catch (err) {
             setMessage("Failed to delete post");
             setMessageType("error");
+        } finally {
+            setDeleteLoading(false);
         }
     };
 
-    // Status badge color
     const getStatusStyle = (status) => {
         switch (status) {
             case "published": return { backgroundColor: "#d4edda", color: "#155724" };
@@ -72,7 +86,7 @@ const MyPosts = () => {
                 {/* HEADER */}
                 <div className="d-flex align-items-center justify-content-between mb-4">
                     <div>
-                        <h4 className="fw-bold mb-0"><IoNewspaper/> My Posts</h4>
+                        <h4 className="fw-bold mb-0"><IoNewspaper /> My Posts</h4>
                         <p style={{ color: "var(--gray)", fontSize: "14px" }}>
                             Manage all your articles and gist
                         </p>
@@ -96,7 +110,7 @@ const MyPosts = () => {
                 {/* EMPTY STATE */}
                 {posts.length === 0 && !loading && (
                     <div className="text-center p-5 bg-white rounded shadow-sm">
-                        <p style={{ fontSize: "40px" }}><TfiWrite/></p>
+                        <p style={{ fontSize: "40px" }}><TfiWrite /></p>
                         <h6 className="fw-bold">No posts yet!</h6>
                         <p style={{ color: "var(--gray)", fontSize: "14px" }}>
                             You haven't written any posts yet. Start sharing your gist!
@@ -215,7 +229,7 @@ const MyPosts = () => {
                                                     <FaEdit size={12} />
                                                 </Link>
                                                 <button
-                                                    onClick={() => handleDelete(post.slug)}
+                                                    onClick={() => openDeleteModal(post.slug, post.title)}
                                                     className="btn btn-sm"
                                                     style={{
                                                         backgroundColor: "#f8d7da",
@@ -223,6 +237,8 @@ const MyPosts = () => {
                                                         padding: "4px 8px"
                                                     }}
                                                     title="Delete"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal"
                                                 >
                                                     <FaTrash size={12} />
                                                 </button>
@@ -235,6 +251,91 @@ const MyPosts = () => {
                     </div>
                 )}
             </div>
+
+            {/* DELETE CONFIRMATION MODAL */}
+            <div
+                className="modal fade"
+                id="deleteModal"
+                tabIndex="-1"
+                aria-labelledby="deleteModalLabel"
+                aria-hidden="true"
+            >
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content" style={{ borderRadius: "12px", border: "none" }}>
+
+                        {/* MODAL HEADER */}
+                        <div className="modal-header border-0 pb-0">
+                            <h5 className="modal-title fw-bold" id="deleteModalLabel" style={{ color: "var(--text)" }}>
+                                <TbTrash/> Delete Post
+                            </h5>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                id="closeDeleteModal"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            />
+                        </div>
+
+                        {/* MODAL BODY */}
+                        <div className="modal-body pt-2">
+                            <p style={{ color: "var(--gray)", fontSize: "14px" }}>
+                                Are you sure you want to delete this post?
+                            </p>
+                            <div
+                                className="p-3 rounded"
+                                style={{ backgroundColor: "#f8d7da", border: "1px solid #f5c6cb" }}
+                            >
+                                <p
+                                    className="mb-0 fw-semibold"
+                                    style={{ fontSize: "14px", color: "#721c24" }}
+                                >
+                                    "{deleteTitle}"
+                                </p>
+                            </div>
+                            <p className="mt-3 mb-0" style={{ color: "var(--red)", fontSize: "13px" }}>
+                                <BiInfoCircle/> This action cannot be undone!
+                            </p>
+                        </div>
+
+                        {/* MODAL FOOTER */}
+                        <div className="modal-footer border-0 pt-0">
+                            <button
+                                type="button"
+                                className="btn fw-semibold"
+                                data-bs-dismiss="modal"
+                                style={{
+                                    border: "1px solid var(--border)",
+                                    color: "var(--gray)",
+                                    fontSize: "14px"
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="btn fw-bold"
+                                onClick={handleDelete}
+                                disabled={deleteLoading}
+                                style={{
+                                    backgroundColor: "var(--red)",
+                                    color: "white",
+                                    fontSize: "14px"
+                                }}
+                            >
+                                {deleteLoading ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" />
+                                        Deleting...
+                                    </>
+                                ) : "Yes, Delete Post"}
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
         </div>
     );
 };
