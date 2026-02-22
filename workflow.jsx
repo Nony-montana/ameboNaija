@@ -7,21 +7,21 @@
 // │   ├── Navbar.jsx         done  
 // │   ├── Footer.jsx           done
 // │   ├── PostCard.jsx         done
-// │   ├── CategoryBadge.jsx    
+// │   ├── CategoryBadge.jsx    done
 // │   └── Spinner.jsx          done
 // │
 // ├── pages/               
 // │   ├── Home.jsx           done  
 // │   ├── SinglePost.jsx       done
-// │   ├── Category.jsx         
-// │   ├── Search.jsx           
+// │   ├── Category.jsx         done
+// │   ├── Search.jsx           done
 // │   ├── Login.jsx          done  
 // │   ├── Register.jsx         done
 // │   └── dashboard/           
 // │       ├── Dashboard.jsx    done
-// │       ├── CreatePost.jsx   
-// │       ├── MyPosts.jsx      
-// │       └── PendingPosts.jsx 
+// │       ├── CreatePost.jsx   done
+// │       ├── MyPosts.jsx      done
+// │       └── PendingPosts.jsx done
 // │
 // ├── store/                    
 // │   ├── store.js              
@@ -35,3 +35,5 @@
 // ├── App.jsx
 // ├── main.jsx
 // └── index.css
+// nodemailer
+// DM

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-    baseURL: "https://theamebonaija.vercel.app",
+    baseURL: "https://amebonaija.vercel.app/api/v1",
 });
 
 API.interceptors.request.use((config) => {
@@ -13,3 +13,5 @@ API.interceptors.request.use((config) => {
 });
 
 export default API;
+
+// http://localhost:5009/api/v1
