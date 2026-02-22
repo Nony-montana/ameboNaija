@@ -39,3 +39,4 @@
 // DM
 
 //edit post
+//adjust sizes on smaller screens
