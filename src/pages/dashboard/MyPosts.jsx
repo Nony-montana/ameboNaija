@@ -20,6 +20,7 @@ const MyPosts = () => {
   const [deleteSlug, setDeleteSlug] = useState(null); // stores slug of post to delete
   const [deleteTitle, setDeleteTitle] = useState(""); // stores title for display in modal
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/login");
