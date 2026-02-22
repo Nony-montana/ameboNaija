@@ -20,9 +20,9 @@ const postSlice = createSlice({
             state.error = null;
         },
         setAllPosts: (state, action) => {
-            state.posts = action.payload.data;
-            state.totalPages = action.payload.totalPages;
-            state.currentPage = action.payload.page;
+            state.posts = action.payload.data || [];
+            state.totalPages = action.payload.totalPages || 1;
+            state.currentPage = action.payload.page || 1;
             state.loading = false;
         },
         setSinglePost: (state, action) => {
@@ -30,11 +30,11 @@ const postSlice = createSlice({
             state.loading = false;
         },
         setTrendingPosts: (state, action) => {
-            state.trendingPosts = action.payload;
+            state.trendingPosts = action.payload || [];
             state.loading = false;
         },
         setPendingPosts: (state, action) => {
-            state.pendingPosts = action.payload;
+            state.pendingPosts = action.payload || [];
             state.loading = false;
         },
         setError: (state, action) => {
