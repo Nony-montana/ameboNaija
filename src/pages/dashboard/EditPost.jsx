@@ -62,7 +62,7 @@ const EditPost = () => {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
 
-                setMessage("Post updated! It will be reviewed by admin before publishing 🎉");
+                setMessage("Post updated! It will be reviewed by admin before publishing");
                 setMessageType("success");
                 setTimeout(() => navigate("/dashboard/my-posts"), 2000);
 
@@ -318,7 +318,7 @@ const EditPost = () => {
                                         <span className="spinner-border spinner-border-sm me-2" />
                                         Saving...
                                     </>
-                                ) : "Save Changes 🚀"}
+                                ) : "Save Changes"}
                             </button>
                             <Link
                                 to="/dashboard/my-posts"
