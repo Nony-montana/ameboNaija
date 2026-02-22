@@ -40,3 +40,6 @@
 
 //edit post
 //adjust sizes on smaller screens
+//user settings
+//admin dashboard
+//preview for users

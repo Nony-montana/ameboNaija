@@ -50,17 +50,20 @@ const EditPost = () => {
                 formData.append("status", values.status);
 
                 if (values.tags) {
-                    const tagsArray = values.tags.split(",").map((t) => t.trim());
-                    tagsArray.forEach((tag) => formData.append("tags[]", tag));
+                    const tagsArray = values.tags.split(",").map((t) => t.trim()).filter(Boolean);
+                    // FIX: Send tags as a JSON string instead of repeated keys,
+                    // so the backend can reliably parse it as an array regardless of multer config.
+                    formData.append("tags", JSON.stringify(tagsArray));
                 }
 
                 if (values.image) {
                     formData.append("image", values.image);
                 }
 
-                await API.put(`/posts/${slug}`, formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
+                // FIX: Let the browser set the Content-Type boundary automatically
+                // by NOT manually setting "Content-Type": "multipart/form-data".
+                // Manually setting it omits the boundary and breaks file uploads.
+                await API.put(`/posts/${slug}`, formData);
 
                 setMessage("Post updated! It will be reviewed by admin before publishing");
                 setMessageType("success");
@@ -88,7 +91,10 @@ const EditPost = () => {
                     content: post.content || "",
                     category: post.category || "",
                     tags: post.tags?.join(", ") || "",
-                    status: post.status || "draft",
+                    // FIX: If a post was previously approved/published and is being
+                    // re-edited, reset to "draft" so the user consciously re-submits.
+                    // For posts already in draft or pending, preserve their status.
+                    status: post.status === "published" ? "draft" : (post.status || "draft"),
                     image: null,
                 });
 
@@ -112,6 +118,16 @@ const EditPost = () => {
             setImagePreview(URL.createObjectURL(file));
         }
     };
+
+    // FIX: Clean up object URLs to avoid memory leaks when component unmounts
+    // or when a new image is selected.
+    useEffect(() => {
+        return () => {
+            if (imagePreview && imagePreview.startsWith("blob:")) {
+                URL.revokeObjectURL(imagePreview);
+            }
+        };
+    }, [imagePreview]);
 
     if (fetchLoading) return <Spinner />;
 
