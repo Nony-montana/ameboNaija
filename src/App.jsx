@@ -33,7 +33,7 @@ function App() {
 
           {/* Dashboard Routes (protected)  */}
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard/:id" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/pending" element={<PendingPosts />} />
           <Route path="/dashboard/create" element={<CreatePost />} />
           <Route path="/dashboard/my-posts" element={<MyPosts />} />
