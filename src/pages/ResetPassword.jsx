@@ -3,8 +3,9 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import API from "../../api/axios";
-import MessageToast from "../../components/ui/MessageToast";
+import MessageToast from "../components/ui/MessageToast";
+import API from "../api/axios";
+import { BiLock } from "react-icons/bi";
 
 const ResetPassword = () => {
     const navigate = useNavigate();
@@ -28,7 +29,7 @@ const ResetPassword = () => {
                 className="d-flex align-items-center justify-content-center px-3"
             >
                 <div className="bg-white rounded shadow-sm p-4 p-md-5 text-center" style={{ maxWidth: "440px" }}>
-                    <div style={{ fontSize: "48px" }}>🔒</div>
+                    <div style={{ fontSize: "48px" }}><BiLock/></div>
                     <h6 className="fw-bold mt-3">Session Expired or Invalid</h6>
                     <p style={{ color: "var(--gray)", fontSize: "13px" }}>
                         This page can only be accessed after verifying your OTP. Please start over.

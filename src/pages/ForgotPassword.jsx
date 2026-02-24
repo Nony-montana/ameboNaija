@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import API from "../../api/axios";
-import MessageToast from "../../components/ui/MessageToast";
+import API from "../api/axios";
+import MessageToast from "../components/ui/MessageToast";
 
 const ForgotPassword = () => {
     const navigate = useNavigate();

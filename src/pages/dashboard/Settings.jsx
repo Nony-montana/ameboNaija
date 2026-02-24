@@ -6,7 +6,8 @@ import * as yup from "yup";
 import { FaCog, FaLock, FaTrashAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import API from "../../api/axios";
 import MessageToast from "../../components/ui/MessageToast";
-import { logout } from "../../redux/slices/authSlice"; // adjust path if needed
+import { FiAlertTriangle } from "react-icons/fi";
+import { logout } from "../../store/slices/authSlice";
 
 const Settings = () => {
     const dispatch = useDispatch();
@@ -229,7 +230,7 @@ const Settings = () => {
                                         className="rounded p-3 mb-4"
                                         style={{ backgroundColor: "#fff5f5", border: "1px solid #fecaca", fontSize: "13px", color: "#dc2626" }}
                                     >
-                                        ⚠️ You are about to delete <strong>{user?.firstName || "your account"}</strong>. All your posts will also be permanently removed.
+                                        <FiAlertTriangle/> You are about to delete <strong>{user?.firstName || "your account"}</strong>. All your posts will also be permanently removed.
                                     </div>
 
                                     <form onSubmit={deleteFormik.handleSubmit} style={{ maxWidth: "460px" }}>
