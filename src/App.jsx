@@ -14,6 +14,9 @@ import PendingPosts from "./pages/dashboard/PendingPosts";
 import CreatePost from "./pages/dashboard/CreatePost";
 import EditPost from "./pages/dashboard/EditPost";
 import PreviewPost from "./pages/dashboard/PreviewPost";
+import Settings from "./pages/dashboard/Settings";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -30,12 +33,15 @@ function App() {
 
           {/* Dashboard Routes (protected)  */}
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/:id" element={<Dashboard />} />
           <Route path="/dashboard/pending" element={<PendingPosts />} />
           <Route path="/dashboard/create" element={<CreatePost />} />
           <Route path="/dashboard/my-posts" element={<MyPosts />} />
           <Route path="/dashboard/edit/:slug" element={<EditPost />} />
           <Route path="/dashboard/preview/:slug" element={<PreviewPost />} />
+          <Route path="/dashboard/settings" element={<Settings />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>

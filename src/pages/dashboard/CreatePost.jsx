@@ -228,7 +228,7 @@ const CreatePost = () => {
                                         alt="preview"
                                         style={{
                                             width: "100%",
-                                            maxHeight: "250px",
+                                            maxHeight: "300px",
                                             objectFit: "cover",
                                             borderRadius: "8px",
                                             border: "1px solid var(--border)"
