@@ -3,20 +3,22 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { FaCog, FaLock, FaTrashAlt, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaCog, FaLock, FaTrashAlt, FaUser } from "react-icons/fa";
 import API from "../../api/axios";
 import MessageToast from "../../components/ui/MessageToast";
 import { FiAlertTriangle } from "react-icons/fi";
-import { logout } from "../../store/slices/authSlice";
+import { logout, updateUser } from "../../store/slices/authSlice"; // add updateUser action
+import PasswordField from "../../components/ui/PasswordField";
 
 const Settings = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { user } = useSelector((state) => state.auth);
 
-    const [activeTab, setActiveTab] = useState("password");
+    const [activeTab, setActiveTab] = useState("profile");
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("");
+    const [loadingProfile, setLoadingProfile] = useState(false);
     const [loadingPassword, setLoadingPassword] = useState(false);
     const [loadingDelete, setLoadingDelete] = useState(false);
 
@@ -30,6 +32,33 @@ const Settings = () => {
         setMessageType(type);
         setTimeout(() => setMessage(""), 4000);
     };
+
+    // ── UPDATE PROFILE ───────────────────────────────
+    const profileFormik = useFormik({
+        initialValues: {
+            firstName: user?.firstName || "",
+            lastName: user?.lastName || "",
+            email: user?.email || "",
+        },
+        validationSchema: yup.object({
+            firstName: yup.string().required("First name is required"),
+            lastName: yup.string().required("Last name is required"),
+            email: yup.string().email("Enter a valid email").required("Email is required"),
+        }),
+        onSubmit: async (values) => {
+            setLoadingProfile(true);
+            try {
+                const res = await API.put("/auth/update-profile", values);
+                // Update redux store so name reflects immediately across the app
+                dispatch(updateUser(res.data.data));
+                showMessage(res.data.message, "success");
+            } catch (err) {
+                showMessage(err.response?.data?.message || "Failed to update profile", "error");
+            } finally {
+                setLoadingProfile(false);
+            }
+        },
+    });
 
     // ── CHANGE PASSWORD ──────────────────────────────
     const passwordFormik = useFormik({
@@ -83,33 +112,23 @@ const Settings = () => {
         },
     });
 
-    const PasswordField = ({ label, name, formik, show, setShow, placeholder }) => (
-        <div className="mb-3">
-            <label className="form-label fw-semibold" style={{ fontSize: "13px" }}>{label}</label>
-            <div className="input-group">
-                <input
-                    type={show ? "text" : "password"}
-                    name={name}
-                    className={`form-control ${formik.touched[name] && formik.errors[name] ? "is-invalid" : ""}`}
-                    placeholder={placeholder || ""}
-                    value={formik.values[name]}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    style={{ fontSize: "14px" }}
-                />
-                <button
-                    type="button"
-                    className="btn btn-outline-secondary"
-                    onClick={() => setShow(!show)}
-                    tabIndex={-1}
-                >
-                    {show ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
-                </button>
-                {formik.touched[name] && formik.errors[name] && (
-                    <div className="invalid-feedback">{formik.errors[name]}</div>
-                )}
-            </div>
-        </div>
+    const tabBtn = (tab, label, icon, danger = false) => (
+        <button
+            className="btn w-100 text-start mb-1 d-flex align-items-center gap-2"
+            style={{
+                fontSize: "14px",
+                backgroundColor: activeTab === tab
+                    ? danger ? "#fff0f0" : "var(--light-green)"
+                    : "transparent",
+                color: activeTab === tab
+                    ? danger ? "#dc2626" : "var(--green)"
+                    : "var(--gray)",
+                fontWeight: activeTab === tab ? "600" : "400",
+            }}
+            onClick={() => setActiveTab(tab)}
+        >
+            {icon} {label}
+        </button>
     );
 
     return (
@@ -143,36 +162,86 @@ const Settings = () => {
                     {/* SIDEBAR TABS */}
                     <div className="col-md-3">
                         <div className="bg-white rounded shadow-sm p-2">
-                            <button
-                                className="btn w-100 text-start mb-1 d-flex align-items-center gap-2"
-                                style={{
-                                    fontSize: "14px",
-                                    backgroundColor: activeTab === "password" ? "var(--light-green)" : "transparent",
-                                    color: activeTab === "password" ? "var(--green)" : "var(--gray)",
-                                    fontWeight: activeTab === "password" ? "600" : "400",
-                                }}
-                                onClick={() => setActiveTab("password")}
-                            >
-                                <FaLock size={13} /> Change Password
-                            </button>
-                            <button
-                                className="btn w-100 text-start d-flex align-items-center gap-2"
-                                style={{
-                                    fontSize: "14px",
-                                    backgroundColor: activeTab === "delete" ? "#fff0f0" : "transparent",
-                                    color: activeTab === "delete" ? "#dc2626" : "var(--gray)",
-                                    fontWeight: activeTab === "delete" ? "600" : "400",
-                                }}
-                                onClick={() => setActiveTab("delete")}
-                            >
-                                <FaTrashAlt size={13} /> Delete Account
-                            </button>
+                            {tabBtn("profile", "Edit Profile", <FaUser size={13} />)}
+                            {tabBtn("password", "Change Password", <FaLock size={13} />)}
+                            {tabBtn("delete", "Delete Account", <FaTrashAlt size={13} />, true)}
                         </div>
                     </div>
 
                     {/* CONTENT */}
                     <div className="col-md-9">
                         <div className="bg-white rounded shadow-sm p-4">
+
+                            {/* ── EDIT PROFILE ── */}
+                            {activeTab === "profile" && (
+                                <>
+                                    <h6 className="fw-bold mb-1">Edit Profile</h6>
+                                    <p style={{ color: "var(--gray)", fontSize: "13px" }} className="mb-4">
+                                        Update your personal information.
+                                    </p>
+                                    <form onSubmit={profileFormik.handleSubmit} style={{ maxWidth: "460px" }}>
+
+                                        <div className="mb-3">
+                                            <label className="form-label fw-semibold" style={{ fontSize: "13px" }}>First Name</label>
+                                            <input
+                                                type="text"
+                                                name="firstName"
+                                                className={`form-control ${profileFormik.touched.firstName && profileFormik.errors.firstName ? "is-invalid" : ""}`}
+                                                value={profileFormik.values.firstName}
+                                                onChange={profileFormik.handleChange}
+                                                onBlur={profileFormik.handleBlur}
+                                                style={{ fontSize: "14px" }}
+                                            />
+                                            {profileFormik.touched.firstName && profileFormik.errors.firstName && (
+                                                <div className="invalid-feedback">{profileFormik.errors.firstName}</div>
+                                            )}
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label fw-semibold" style={{ fontSize: "13px" }}>Last Name</label>
+                                            <input
+                                                type="text"
+                                                name="lastName"
+                                                className={`form-control ${profileFormik.touched.lastName && profileFormik.errors.lastName ? "is-invalid" : ""}`}
+                                                value={profileFormik.values.lastName}
+                                                onChange={profileFormik.handleChange}
+                                                onBlur={profileFormik.handleBlur}
+                                                style={{ fontSize: "14px" }}
+                                            />
+                                            {profileFormik.touched.lastName && profileFormik.errors.lastName && (
+                                                <div className="invalid-feedback">{profileFormik.errors.lastName}</div>
+                                            )}
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <label className="form-label fw-semibold" style={{ fontSize: "13px" }}>Email Address</label>
+                                            <input
+                                                type="email"
+                                                name="email"
+                                                className={`form-control ${profileFormik.touched.email && profileFormik.errors.email ? "is-invalid" : ""}`}
+                                                value={profileFormik.values.email}
+                                                onChange={profileFormik.handleChange}
+                                                onBlur={profileFormik.handleBlur}
+                                                style={{ fontSize: "14px" }}
+                                            />
+                                            {profileFormik.touched.email && profileFormik.errors.email && (
+                                                <div className="invalid-feedback">{profileFormik.errors.email}</div>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            className="btn fw-bold px-4"
+                                            disabled={loadingProfile}
+                                            style={{ backgroundColor: "var(--green)", color: "white", fontSize: "14px" }}
+                                        >
+                                            {loadingProfile ? (
+                                                <><span className="spinner-border spinner-border-sm me-2" />Saving...</>
+                                            ) : "Save Changes"}
+                                        </button>
+                                    </form>
+                                </>
+                            )}
 
                             {/* ── CHANGE PASSWORD ── */}
                             {activeTab === "password" && (
@@ -225,14 +294,12 @@ const Settings = () => {
                                     <p style={{ color: "var(--gray)", fontSize: "13px" }} className="mb-3">
                                         This permanently deletes your account and all your posts. This cannot be undone.
                                     </p>
-
                                     <div
                                         className="rounded p-3 mb-4"
                                         style={{ backgroundColor: "#fff5f5", border: "1px solid #fecaca", fontSize: "13px", color: "#dc2626" }}
                                     >
-                                        <FiAlertTriangle/> You are about to delete <strong>{user?.firstName || "your account"}</strong>. All your posts will also be permanently removed.
+                                        <FiAlertTriangle /> You are about to delete <strong>{user?.firstName || "your account"}</strong>. All your posts will also be permanently removed.
                                     </div>
-
                                     <form onSubmit={deleteFormik.handleSubmit} style={{ maxWidth: "460px" }}>
                                         <PasswordField
                                             label="Enter your password to confirm"
