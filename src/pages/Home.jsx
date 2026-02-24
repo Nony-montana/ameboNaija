@@ -84,7 +84,7 @@ const Home = () => {
             <span
               style={{
                 display: "inline-block",
-                animation: "ticker 10s linear infinite",
+                animation: "ticker 35s linear infinite",
                 fontSize: "13px",
               }}
             >
