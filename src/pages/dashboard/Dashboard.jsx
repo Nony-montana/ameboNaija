@@ -25,7 +25,7 @@ const Dashboard = () => {
           className="p-4 rounded mb-4 shadow-sm"
           style={{ backgroundColor: "var(--green)", color: "white" }}
         >
-          <h4 className="fw-bold mb-1">Welcome back, {user?.firstName}! 👋</h4>
+          <h4 className="fw-bold mb-1">Welcome back, {user?.firstName}! </h4>
           <p className="mb-0" style={{ fontSize: "14px", color: "#ccffcc" }}>
             {user?.roles === "admin"
               ? "You have full admin access to Amebo Naija"

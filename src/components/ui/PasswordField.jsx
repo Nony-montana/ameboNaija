@@ -1,4 +1,5 @@
 import React from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const PasswordField = ({ label, name, formik, show, setShow, placeholder }) => {
   return (
