@@ -20,7 +20,6 @@ import PreviewPost from "./pages/dashboard/PreviewPost";
 import Settings from "./pages/dashboard/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import PreviewMyPost from "./pages/PreviewMyPost";
 import { setUser, logout } from "./store/slices/authSlice";
 import API from "./api/axios";
 
@@ -43,7 +42,7 @@ function App() {
         // expired or been invalidated, then restore user state into Redux
         const restoreAuth = async () => {
             try {
-                const res = await API.get("/auth/me", {
+                const res = await API.get("/me", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 dispatch(setUser(res.data.data));
@@ -83,7 +82,6 @@ function App() {
                     <Route path="/dashboard/edit/:slug" element={<EditPost />} />
                     <Route path="/dashboard/preview/:slug" element={<PreviewPost />} />
                     <Route path="/dashboard/settings" element={<Settings />} />
-                    <Route path="/dashboard/preview-post/:slug" element={<PreviewMyPost />} />
 
                     <Route path="*" element={<NotFound />} />
                 </Routes>
