@@ -253,6 +253,18 @@ const MyPosts = () => {
                             <FaEye size={12} /> Preview
                           </Link>
                         )}
+                        {user?.roles ="user" && (
+                          <Link
+                            to={`/dashboard/preview-post/${post.slug}`}
+                            className="btn btn-sm fw-semibold d-flex align-items-center justify-content-center gap-1"
+                            style={{
+                              border: "1px solid var(--green)",
+                              color: "var(--green)",
+                            }}
+                          >
+                            <FaEye size={12} /> Preview
+                          </Link>
+                        )}
                         <Link
                           to={`/dashboard/edit/${post.slug}`}
                           className="btn btn-sm"

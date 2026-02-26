@@ -200,7 +200,7 @@ const EditPost = () => {
                                     style={{ fontSize: "14px" }}
                                 >
                                     <option value="">Select a category</option>
-                                    {["news", "gist", "gossip", "entertainment", "lifestyle"].map((cat) => (
+                                    {["news", "gist", "gossip", "entertainment", "lifestyle", "sports"].map((cat) => (
                                         <option key={cat} value={cat}>
                                             {cat.charAt(0).toUpperCase() + cat.slice(1)}
                                         </option>

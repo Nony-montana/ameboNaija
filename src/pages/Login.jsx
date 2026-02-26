@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import Cookies from "universal-cookie";
 import API from "../api/axios";
 import { loginSuccess } from "../store/slices/authSlice";
 import { FaEye, FaEyeSlash, FaSignInAlt } from "react-icons/fa";
@@ -8,6 +9,8 @@ import logo from "../assets/Logo.png";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import MessageToast from "../components/ui/MessageToast";
+
+const cookies = new Cookies();
 
 const Login = () => {
     const dispatch = useDispatch();
@@ -42,6 +45,21 @@ const Login = () => {
                     password: values.password,
                 });
 
+                // Save token to cookies with 5 hour expiry — matches JWT expiry
+                cookies.set("token", res.data.token, {
+                    path: "/",
+                    maxAge: 5 * 60 * 60, // 5 hours in seconds
+                    sameSite: "strict",
+                });
+
+                // Save user data to cookies so it survives page refresh
+                cookies.set("user", res.data.data, {
+                    path: "/",
+                    maxAge: 5 * 60 * 60,
+                    sameSite: "strict",
+                });
+
+                // Update Redux state
                 dispatch(loginSuccess({
                     user: res.data.data,
                     token: res.data.token,
@@ -83,7 +101,7 @@ const Login = () => {
                         style={{ height: "150px", objectFit: "contain" }}
                     />
                     <p style={{ color: "var(--gray)", fontSize: "14px", marginTop: "8px" }}>
-                        Welcome back! The gist is waiting 🔥
+                        Welcome back! The gist is waiting 
                     </p>
                 </div>
 
@@ -98,10 +116,7 @@ const Login = () => {
                 {/* MESSAGE TOAST */}
                 {message && (
                     <div className="mb-3">
-                        <MessageToast
-                            message={message}
-                            messageType={messageType}
-                        />
+                        <MessageToast message={message} messageType={messageType} />
                     </div>
                 )}
 
@@ -161,10 +176,17 @@ const Login = () => {
                         </div>
                     </div>
 
+                    {/* FORGOT PASSWORD */}
+                    <div className="text-end mt-2 mb-3">
+                        <Link to="/forgot-password" style={{ fontSize: "13px", color: "var(--green)" }}>
+                            Forgot password?
+                        </Link>
+                    </div>
+
                     {/* SUBMIT BUTTON */}
                     <button
                         type="submit"
-                        className="btn w-100 fw-bold mt-4"
+                        className="btn w-100 fw-bold mt-2"
                         disabled={loading}
                         style={{
                             backgroundColor: "var(--green)",
@@ -178,9 +200,7 @@ const Login = () => {
                                 <span className="spinner-border spinner-border-sm me-2" />
                                 Logging in...
                             </>
-                        ) : (
-                            "Login"
-                        )}
+                        ) : "Login"}
                     </button>
                 </form>
 
@@ -199,7 +219,7 @@ const Login = () => {
                         fontSize: "14px",
                     }}
                 >
-                   Register
+                    Register
                 </Link>
             </div>
         </div>
