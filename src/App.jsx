@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+// import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
-import { useDispatch } from "react-redux";
+// import { useDispatch } from "react-redux";
 import Cookies from "universal-cookie";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -20,42 +20,42 @@ import PreviewPost from "./pages/dashboard/PreviewPost";
 import Settings from "./pages/dashboard/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import { setUser, logout } from "./store/slices/authSlice";
-import API from "./api/axios";
+// import { setUser, logout } from "./store/slices/authSlice";
+// import API from "./api/axios";
 
 const cookies = new Cookies();
 
 function App() {
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
 
-    useEffect(() => {
-        const token = cookies.get("token");
-        const user = cookies.get("user");
+    // useEffect(() => {
+    //     const token = cookies.get("token");
+    //     const user = cookies.get("user");
 
-        if (!token || !user) {
-            // No valid cookie — clear redux and stay logged out
-            dispatch(logout());
-            return;
-        }
+    //     if (!token || !user) {
+    //         // No valid cookie — clear redux and stay logged out
+    //         dispatch(logout());
+    //         return;
+    //     }
 
-        // Cookie exists — validate token with backend to make sure it hasn't
-        // expired or been invalidated, then restore user state into Redux
-        const restoreAuth = async () => {
-            try {
-                const res = await API.get("/me", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                dispatch(setUser(res.data.data));
-            } catch {
-                // Token invalid or expired — clear cookies and redux
-                cookies.remove("token", { path: "/" });
-                cookies.remove("user", { path: "/" });
-                dispatch(logout());
-            }
-        };
+    //     // Cookie exists — validate token with backend to make sure it hasn't
+    //     // expired or been invalidated, then restore user state into Redux
+    //     const restoreAuth = async () => {
+    //         try {
+    //             const res = await API.get("/me", {
+    //                 headers: { Authorization: `Bearer ${token}` },
+    //             });
+    //             dispatch(setUser(res.data.data));
+    //         } catch {
+    //             // Token invalid or expired — clear cookies and redux
+    //             cookies.remove("token", { path: "/" });
+    //             cookies.remove("user", { path: "/" });
+    //             dispatch(logout());
+    //         }
+    //     };
 
-        restoreAuth();
-    }, []);
+    //     restoreAuth();
+    // }, []);
 
     return (
         <>

@@ -42,6 +42,6 @@
 //adjust sizes on smaller screens
 //user settings ✅
 //admin dashboard
-//preview for users
+//preview for users✅
 //the url should contain user id...✅
 //a page to fetch all posts in each category
