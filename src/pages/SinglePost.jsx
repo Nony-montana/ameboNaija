@@ -272,7 +272,7 @@ const SinglePost = () => {
                                 )}
 
                                 {singlePost.comments?.map((c) => (
-                                    <div key={c._id} className="d-flex gap-3 mb-3 p-3 rounded" style={{ backgroundColor: "var(--light-green)" }}>
+                                    <div key={c.id} className="d-flex gap-3 mb-3 p-3 rounded" style={{ backgroundColor: "var(--light-green)" }}>
                                         <FaUserCircle size={28} color="var(--green)" className="flex-shrink-0 mt-1" />
                                         <div className="w-100">
 
@@ -287,9 +287,9 @@ const SinglePost = () => {
                                                     </small>
 
                                                     {/* EDIT — only comment owner, hidden while editing */}
-                                                    {user?.id === c.user?._id && editingCommentId !== c._id && (
+                                                    {user?.id === c.user?.id && editingCommentId !== c.id && (
                                                         <button
-                                                            onClick={() => handleEditComment(c._id, c.text)}
+                                                            onClick={() => handleEditComment(c.id, c.text)}
                                                             className="btn btn-sm p-0"
                                                             style={{ color: "var(--green)", border: "none", background: "none" }}
                                                             title="Edit comment"
@@ -299,9 +299,9 @@ const SinglePost = () => {
                                                     )}
 
                                                     {/* DELETE — comment owner or admin, hidden while editing */}
-                                                    {(user?.id === c.user?._id || user?.roles === "admin") && editingCommentId !== c._id && (
+                                                    {(user?.id === c.user?.id || user?.roles === "admin") && editingCommentId !== c.id && (
                                                         <button
-                                                            onClick={() => handleDeleteComment(c._id)}
+                                                            onClick={() => handleDeleteComment(c.id)}
                                                             className="btn btn-sm p-0"
                                                             style={{ color: "var(--red)", border: "none", background: "none" }}
                                                             title="Delete comment"
@@ -313,7 +313,7 @@ const SinglePost = () => {
                                             </div>
 
                                             {/* COMMENT BODY — normal view or inline edit */}
-                                            {editingCommentId === c._id ? (
+                                            {editingCommentId === c.id ? (
                                                 <div className="mt-2">
                                                     <textarea
                                                         className="form-control mb-2" rows={2} autoFocus
@@ -322,7 +322,7 @@ const SinglePost = () => {
                                                     />
                                                     <div className="d-flex gap-2">
                                                         <button
-                                                            onClick={() => handleSaveEdit(c._id)}
+                                                            onClick={() => handleSaveEdit(c.id)}
                                                             className="btn btn-sm fw-semibold d-flex align-items-center gap-1"
                                                             disabled={editLoading}
                                                             style={{ backgroundColor: "var(--green)", color: "white", fontSize: "12px" }}
