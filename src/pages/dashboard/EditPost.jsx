@@ -137,7 +137,7 @@ const EditPost = () => {
             <div className="container py-5">
 
                 {/* HEADER */}
-                <div className="d-flex align-items-center justify-content-between mb-4">
+                <div className="d-flex flex-md-row align-items-start flex-column align-items-md-center justify-content-between mb-4">
                     <div>
                         <h4 className="fw-bold mb-0 d-flex align-items-center gap-2">
                             <FaEdit color="var(--green)" /> Edit Post

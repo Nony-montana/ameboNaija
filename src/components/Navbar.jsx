@@ -70,7 +70,7 @@ const Navbar = () => {
             {/* SEARCH BAR */}
             <form
               className="d-flex mx-auto my-2 my-lg-0"
-              style={{ width: "350px" }}
+              style={{ width: "300px" }}
               onSubmit={handleSearch}
             >
               <div className="input-group">
@@ -178,7 +178,7 @@ const Navbar = () => {
       {/* CATEGORY NAV BAR */}
       <div style={{ backgroundColor: "var(--gold)" }}>
         <div className="container">
-          <ul className="nav justify-content-center py-1">
+          <ul className="nav justify-content-center py-1" >
             {tabs.map((cat) => (
               <li className="nav-item" key={cat}>
                 <Link
@@ -187,7 +187,7 @@ const Navbar = () => {
                   style={{
                     fontSize: "14px",
                     color: activeTab === cat ? "var(--green)" : "var(--text)",
-                    transition: "all 0.2s ease",
+                    transition: "all 0.2s ease"
                   }}
                 >
                   {cat}

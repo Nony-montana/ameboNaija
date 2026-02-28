@@ -7,7 +7,8 @@ import Spinner from "../components/Spinner";
 import MessageToast from "../components/ui/MessageToast";
 import {
     FaEye, FaHeart, FaShareAlt, FaClock,
-    FaUserCircle, FaTrash, FaComment
+    FaUserCircle, FaTrash, FaComment,
+    FaEdit, FaCheck, FaTimes
 } from "react-icons/fa";
 
 const SinglePost = () => {
@@ -25,6 +26,11 @@ const SinglePost = () => {
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("");
 
+    // Edit comment state
+    const [editingCommentId, setEditingCommentId] = useState(null);
+    const [editText, setEditText] = useState("");
+    const [editLoading, setEditLoading] = useState(false);
+
     // =====================
     // FETCH SINGLE POST
     // =====================
@@ -36,7 +42,6 @@ const SinglePost = () => {
                 setLikeCount(res.data.data.likes?.length || 0);
                 setShareCount(res.data.data.shares || 0);
 
-                // Check if current user already liked this post
                 if (user && res.data.data.likes?.includes(user._id)) {
                     setLiked(true);
                 }
@@ -47,39 +52,37 @@ const SinglePost = () => {
         };
 
         fetchPost();
-
-        // Clear post when leaving the page
         return () => dispatch(clearSinglePost());
     }, [slug]);
 
-    // =====================
-    // FORMAT DATE
-    // =====================
     const formatDate = (date) => {
         return new Date(date).toLocaleDateString("en-NG", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
+            day: "numeric", month: "long", year: "numeric",
         });
+    };
+
+    // Helper to refresh post after any comment action
+    const refreshPost = async () => {
+        const res = await API.get(`/posts/${slug}`);
+        dispatch(setSinglePost(res.data.data));
+    };
+
+    const showMessage = (msg, type) => {
+        setMessage(msg);
+        setMessageType(type);
+        setTimeout(() => setMessage(""), 3000);
     };
 
     // =====================
     // LIKE / UNLIKE
     // =====================
     const handleLike = async () => {
-        if (!isLoggedIn) {
-            setMessage("Please login to like this post");
-            setMessageType("error");
-            return;
-        }
+        if (!isLoggedIn) { showMessage("Please login to like this post", "error"); return; }
         try {
             const res = await API.post(`/posts/${slug}/like`);
             setLiked(!liked);
             setLikeCount(res.data.totalLikes);
-        } catch (err) {
-            setMessage("Failed to like post");
-            setMessageType("error");
-        }
+        } catch { showMessage("Failed to like post", "error"); }
     };
 
     // =====================
@@ -89,14 +92,9 @@ const SinglePost = () => {
         try {
             await API.post(`/posts/${slug}/share`);
             setShareCount(shareCount + 1);
-            // Copy link to clipboard
             navigator.clipboard.writeText(window.location.href);
-            setMessage("Link copied to clipboard!");
-            setMessageType("success");
-        } catch (err) {
-            setMessage("Failed to share post");
-            setMessageType("error");
-        }
+            showMessage("Link copied to clipboard!", "success");
+        } catch { showMessage("Failed to share post", "error"); }
     };
 
     // =====================
@@ -104,31 +102,16 @@ const SinglePost = () => {
     // =====================
     const handleComment = async (e) => {
         e.preventDefault();
-        if (!isLoggedIn) {
-            setMessage("Please login to comment");
-            setMessageType("error");
-            return;
-        }
-        if (!comment.trim()) {
-            setMessage("Comment cannot be empty");
-            setMessageType("error");
-            return;
-        }
+        if (!isLoggedIn) { showMessage("Please login to comment", "error"); return; }
+        if (!comment.trim()) { showMessage("Comment cannot be empty", "error"); return; }
         setCommentLoading(true);
         try {
             await API.post(`/posts/${slug}/comment`, { text: comment });
             setComment("");
-            setMessage("Comment added successfully!");
-            setMessageType("success");
-            // Refresh post to show new comment
-            const res = await API.get(`/posts/${slug}`);
-            dispatch(setSinglePost(res.data.data));
-        } catch (err) {
-            setMessage("Failed to add comment");
-            setMessageType("error");
-        } finally {
-            setCommentLoading(false);
-        }
+            showMessage("Comment added successfully!", "success");
+            await refreshPost();
+        } catch { showMessage("Failed to add comment", "error"); }
+        finally { setCommentLoading(false); }
     };
 
     // =====================
@@ -137,15 +120,38 @@ const SinglePost = () => {
     const handleDeleteComment = async (commentId) => {
         try {
             await API.delete(`/posts/${slug}/comment/${commentId}`);
-            setMessage("Comment deleted");
-            setMessageType("success");
-            // Refresh post
-            const res = await API.get(`/posts/${slug}`);
-            dispatch(setSinglePost(res.data.data));
+            showMessage("Comment deleted", "success");
+            await refreshPost();
+        } catch { showMessage("Failed to delete comment", "error"); }
+    };
+
+    // =====================
+    // EDIT COMMENT — open inline editor
+    // =====================
+    const handleEditComment = (commentId, currentText) => {
+        setEditingCommentId(commentId);
+        setEditText(currentText); // pre-fill with existing text
+    };
+
+    // Cancel edit
+    const handleCancelEdit = () => {
+        setEditingCommentId(null);
+        setEditText("");
+    };
+
+    // Save edited comment
+    const handleSaveEdit = async (commentId) => {
+        if (!editText.trim()) { showMessage("Comment cannot be empty", "error"); return; }
+        setEditLoading(true);
+        try {
+            await API.put(`/posts/${slug}/comment/${commentId}`, { text: editText });
+            setEditingCommentId(null);
+            setEditText("");
+            showMessage("Comment updated!", "success");
+            await refreshPost();
         } catch (err) {
-            setMessage("Failed to delete comment");
-            setMessageType("error");
-        }
+            showMessage(err.response?.data?.message || "Failed to update comment", "error");
+        } finally { setEditLoading(false); }
     };
 
     if (loading || !singlePost) return <Spinner />;
@@ -164,14 +170,7 @@ const SinglePost = () => {
                                 <Link
                                     to={`/category/${singlePost.category}`}
                                     className="text-capitalize fw-bold"
-                                    style={{
-                                        backgroundColor: "var(--green)",
-                                        color: "white",
-                                        padding: "3px 10px",
-                                        borderRadius: "4px",
-                                        fontSize: "12px",
-                                        textDecoration: "none"
-                                    }}
+                                    style={{ backgroundColor: "var(--green)", color: "white", padding: "3px 10px", borderRadius: "4px", fontSize: "12px", textDecoration: "none" }}
                                 >
                                     {singlePost.category}
                                 </Link>
@@ -181,14 +180,7 @@ const SinglePost = () => {
                             </div>
 
                             {/* TITLE */}
-                            <h1
-                                className="fw-bold"
-                                style={{
-                                    fontSize: "26px",
-                                    lineHeight: "1.4",
-                                    color: "var(--text)"
-                                }}
-                            >
+                            <h1 className="fw-bold" style={{ fontSize: "26px", lineHeight: "1.4", color: "var(--text)" }}>
                                 {singlePost.title}
                             </h1>
 
@@ -208,11 +200,7 @@ const SinglePost = () => {
                             {/* COVER IMAGE */}
                             {singlePost.image && (
                                 <div className="mb-4" style={{ borderRadius: "8px", overflow: "hidden" }}>
-                                    <img
-                                        src={singlePost.image}
-                                        alt={singlePost.title}
-                                        style={{ width: "100%", maxHeight: "450px", objectFit: "cover" }}
-                                    />
+                                    <img src={singlePost.image} alt={singlePost.title} style={{ width: "100%", maxHeight: "450px", objectFit: "cover" }} />
                                 </div>
                             )}
 
@@ -220,17 +208,7 @@ const SinglePost = () => {
                             {singlePost.tags?.length > 0 && (
                                 <div className="d-flex flex-wrap gap-2 mb-3">
                                     {singlePost.tags.map((tag, i) => (
-                                        <span
-                                            key={i}
-                                            style={{
-                                                backgroundColor: "var(--light-green)",
-                                                color: "var(--green)",
-                                                padding: "3px 10px",
-                                                borderRadius: "20px",
-                                                fontSize: "12px",
-                                                fontWeight: "600"
-                                            }}
-                                        >
+                                        <span key={i} style={{ backgroundColor: "var(--light-green)", color: "var(--green)", padding: "3px 10px", borderRadius: "20px", fontSize: "12px", fontWeight: "600" }}>
                                             #{tag}
                                         </span>
                                     ))}
@@ -238,55 +216,21 @@ const SinglePost = () => {
                             )}
 
                             {/* CONTENT */}
-                            <div
-                                style={{
-                                    fontSize: "16px",
-                                    lineHeight: "1.9",
-                                    color: "var(--text)",
-                                    borderTop: "1px solid var(--border)",
-                                    paddingTop: "20px"
-                                }}
-                            >
+                            <div style={{ fontSize: "16px", lineHeight: "1.9", color: "var(--text)", borderTop: "1px solid var(--border)", paddingTop: "20px" }}>
                                 {singlePost.content}
                             </div>
 
                             {/* STATS & ACTIONS */}
-                            <div
-                                className="d-flex align-items-center gap-3 mt-4 pt-3"
-                                style={{ borderTop: "1px solid var(--border)" }}
-                            >
-                                {/* VIEWS */}
+                            <div className="d-flex align-items-center gap-3 mt-4 pt-3" style={{ borderTop: "1px solid var(--border)" }}>
                                 <span style={{ color: "var(--gray)", fontSize: "14px" }}>
                                     <FaEye size={14} /> {singlePost.views} views
                                 </span>
-
-                                {/* LIKE BUTTON */}
-                                <button
-                                    onClick={handleLike}
-                                    className="btn btn-sm d-flex align-items-center gap-1"
-                                    style={{
-                                        backgroundColor: liked ? "#ffe6e6" : "var(--light-green)",
-                                        color: liked ? "var(--red)" : "var(--green)",
-                                        border: "none",
-                                        fontWeight: "600",
-                                        fontSize: "13px"
-                                    }}
-                                >
+                                <button onClick={handleLike} className="btn btn-sm d-flex align-items-center gap-1"
+                                    style={{ backgroundColor: liked ? "#ffe6e6" : "var(--light-green)", color: liked ? "var(--red)" : "var(--green)", border: "none", fontWeight: "600", fontSize: "13px" }}>
                                     <FaHeart /> {likeCount} {liked ? "Liked" : "Like"}
                                 </button>
-
-                                {/* SHARE BUTTON */}
-                                <button
-                                    onClick={handleShare}
-                                    className="btn btn-sm d-flex align-items-center gap-1"
-                                    style={{
-                                        backgroundColor: "var(--light-green)",
-                                        color: "var(--green)",
-                                        border: "none",
-                                        fontWeight: "600",
-                                        fontSize: "13px"
-                                    }}
-                                >
+                                <button onClick={handleShare} className="btn btn-sm d-flex align-items-center gap-1"
+                                    style={{ backgroundColor: "var(--light-green)", color: "var(--green)", border: "none", fontWeight: "600", fontSize: "13px" }}>
                                     <FaShareAlt /> {shareCount} Share
                                 </button>
                             </div>
@@ -294,10 +238,7 @@ const SinglePost = () => {
                             {/* MESSAGE TOAST */}
                             {message && (
                                 <div className="mt-3">
-                                    <MessageToast
-                                        message={message}
-                                        messageType={messageType}
-                                    />
+                                    <MessageToast message={message} messageType={messageType} />
                                 </div>
                             )}
 
@@ -311,33 +252,15 @@ const SinglePost = () => {
                                 {/* COMMENT FORM */}
                                 <form onSubmit={handleComment} className="mb-4">
                                     <textarea
-                                        className="form-control mb-2"
-                                        rows={3}
+                                        className="form-control mb-2" rows={3}
                                         placeholder={isLoggedIn ? "Share your thoughts..." : "Login to leave a comment"}
-                                        value={comment}
-                                        onChange={(e) => setComment(e.target.value)}
+                                        value={comment} onChange={(e) => setComment(e.target.value)}
                                         disabled={!isLoggedIn}
-                                        style={{
-                                            fontSize: "14px",
-                                            borderColor: "var(--border)",
-                                            resize: "none"
-                                        }}
+                                        style={{ fontSize: "14px", borderColor: "var(--border)", resize: "none" }}
                                     />
-                                    <button
-                                        type="submit"
-                                        className="btn btn-sm fw-semibold"
-                                        disabled={commentLoading || !isLoggedIn}
-                                        style={{
-                                            backgroundColor: "var(--green)",
-                                            color: "white"
-                                        }}
-                                    >
-                                        {commentLoading ? (
-                                            <>
-                                                <span className="spinner-border spinner-border-sm me-1" />
-                                                Posting...
-                                            </>
-                                        ) : "Post Comment"}
+                                    <button type="submit" className="btn btn-sm fw-semibold" disabled={commentLoading || !isLoggedIn}
+                                        style={{ backgroundColor: "var(--green)", color: "white" }}>
+                                        {commentLoading ? <><span className="spinner-border spinner-border-sm me-1" />Posting...</> : "Post Comment"}
                                     </button>
                                 </form>
 
@@ -349,13 +272,11 @@ const SinglePost = () => {
                                 )}
 
                                 {singlePost.comments?.map((c) => (
-                                    <div
-                                        key={c._id}
-                                        className="d-flex gap-3 mb-3 p-3 rounded"
-                                        style={{ backgroundColor: "var(--light-green)" }}
-                                    >
+                                    <div key={c._id} className="d-flex gap-3 mb-3 p-3 rounded" style={{ backgroundColor: "var(--light-green)" }}>
                                         <FaUserCircle size={28} color="var(--green)" className="flex-shrink-0 mt-1" />
                                         <div className="w-100">
+
+                                            {/* COMMENT HEADER */}
                                             <div className="d-flex justify-content-between align-items-center">
                                                 <p className="mb-0 fw-semibold" style={{ fontSize: "13px" }}>
                                                     {c.user?.firstName} {c.user?.lastName}
@@ -364,21 +285,68 @@ const SinglePost = () => {
                                                     <small style={{ color: "var(--gray)", fontSize: "11px" }}>
                                                         {formatDate(c.createdAt)}
                                                     </small>
-                                                    {/* Show delete only to comment owner or admin */}
-                                                    {(user?._id === c.user?._id || user?.roles === "admin") && (
+
+                                                    {/* EDIT — only comment owner, hidden while editing */}
+                                                    {user?.id === c.user?._id && editingCommentId !== c._id && (
+                                                        <button
+                                                            onClick={() => handleEditComment(c._id, c.text)}
+                                                            className="btn btn-sm p-0"
+                                                            style={{ color: "var(--green)", border: "none", background: "none" }}
+                                                            title="Edit comment"
+                                                        >
+                                                            <FaEdit size={11} />
+                                                        </button>
+                                                    )}
+
+                                                    {/* DELETE — comment owner or admin, hidden while editing */}
+                                                    {(user?.id === c.user?._id || user?.roles === "admin") && editingCommentId !== c._id && (
                                                         <button
                                                             onClick={() => handleDeleteComment(c._id)}
                                                             className="btn btn-sm p-0"
                                                             style={{ color: "var(--red)", border: "none", background: "none" }}
+                                                            title="Delete comment"
                                                         >
                                                             <FaTrash size={11} />
                                                         </button>
                                                     )}
                                                 </div>
                                             </div>
-                                            <p className="mb-0 mt-1" style={{ fontSize: "14px", color: "var(--text)" }}>
-                                                {c.text}
-                                            </p>
+
+                                            {/* COMMENT BODY — normal view or inline edit */}
+                                            {editingCommentId === c._id ? (
+                                                <div className="mt-2">
+                                                    <textarea
+                                                        className="form-control mb-2" rows={2} autoFocus
+                                                        value={editText} onChange={(e) => setEditText(e.target.value)}
+                                                        style={{ fontSize: "13px", resize: "none" }}
+                                                    />
+                                                    <div className="d-flex gap-2">
+                                                        <button
+                                                            onClick={() => handleSaveEdit(c._id)}
+                                                            className="btn btn-sm fw-semibold d-flex align-items-center gap-1"
+                                                            disabled={editLoading}
+                                                            style={{ backgroundColor: "var(--green)", color: "white", fontSize: "12px" }}
+                                                        >
+                                                            {editLoading
+                                                                ? <span className="spinner-border spinner-border-sm" />
+                                                                : <><FaCheck size={10} /> Save</>
+                                                            }
+                                                        </button>
+                                                        <button
+                                                            onClick={handleCancelEdit}
+                                                            className="btn btn-sm d-flex align-items-center gap-1"
+                                                            style={{ border: "1px solid var(--border)", color: "var(--gray)", fontSize: "12px" }}
+                                                        >
+                                                            <FaTimes size={10} /> Cancel
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <p className="mb-0 mt-1" style={{ fontSize: "14px", color: "var(--text)" }}>
+                                                    {c.text}
+                                                </p>
+                                            )}
+
                                         </div>
                                     </div>
                                 ))}
@@ -391,29 +359,11 @@ const SinglePost = () => {
 
                         {/* TAGS WIDGET */}
                         {singlePost.tags?.length > 0 && (
-                            <div
-                                className="p-3 rounded shadow-sm mb-4"
-                                style={{ backgroundColor: "white", border: "1px solid var(--border)" }}
-                            >
-                                <h6
-                                    className="fw-bold mb-3 pb-2"
-                                    style={{ borderBottom: "2px solid var(--green)" }}
-                                >
-                                    Tags
-                                </h6>
+                            <div className="p-3 rounded shadow-sm mb-4" style={{ backgroundColor: "white", border: "1px solid var(--border)" }}>
+                                <h6 className="fw-bold mb-3 pb-2" style={{ borderBottom: "2px solid var(--green)" }}>Tags</h6>
                                 <div className="d-flex flex-wrap gap-2">
                                     {singlePost.tags.map((tag, i) => (
-                                        <span
-                                            key={i}
-                                            style={{
-                                                backgroundColor: "var(--light-green)",
-                                                color: "var(--green)",
-                                                padding: "4px 12px",
-                                                borderRadius: "20px",
-                                                fontSize: "12px",
-                                                fontWeight: "600"
-                                            }}
-                                        >
+                                        <span key={i} style={{ backgroundColor: "var(--light-green)", color: "var(--green)", padding: "4px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: "600" }}>
                                             #{tag}
                                         </span>
                                     ))}
@@ -421,32 +371,18 @@ const SinglePost = () => {
                             </div>
                         )}
 
-                        {/* CATEGORIES WIDGET */}
-                        <div
-                            className="p-3 rounded shadow-sm"
-                            style={{ backgroundColor: "white", border: "1px solid var(--border)" }}
-                        >
-                            <h6
-                                className="fw-bold mb-3 pb-2"
-                                style={{ borderBottom: "2px solid var(--green)" }}
-                            >
-                                Browse Categories
-                            </h6>
+                        {/* CATEGORIES WIDGET — sports added */}
+                        <div className="p-3 rounded shadow-sm" style={{ backgroundColor: "white", border: "1px solid var(--border)" }}>
+                            <h6 className="fw-bold mb-3 pb-2" style={{ borderBottom: "2px solid var(--green)" }}>Browse Categories</h6>
                             <div className="d-flex flex-wrap gap-2">
-                                {["news", "gist", "gossip", "entertainment", "lifestyle"].map((cat) => (
+                                {["news", "gist", "gossip", "entertainment", "lifestyle", "sports"].map((cat) => (
                                     <Link
-                                        key={cat}
-                                        to={`/category/${cat}`}
-                                        className="text-capitalize"
+                                        key={cat} to={`/category/${cat}`} className="text-capitalize"
                                         style={{
                                             backgroundColor: singlePost.category === cat ? "var(--green)" : "var(--light-green)",
                                             color: singlePost.category === cat ? "white" : "var(--green)",
-                                            padding: "5px 12px",
-                                            borderRadius: "20px",
-                                            fontSize: "13px",
-                                            fontWeight: "600",
-                                            textDecoration: "none",
-                                            border: "1px solid var(--green)"
+                                            padding: "5px 12px", borderRadius: "20px", fontSize: "13px",
+                                            fontWeight: "600", textDecoration: "none", border: "1px solid var(--green)"
                                         }}
                                     >
                                         {cat}

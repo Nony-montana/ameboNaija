@@ -63,6 +63,21 @@ const PreviewPost = () => {
     }
   };
 
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "published":
+        return { backgroundColor: "#d4edda", color: "#155724" };
+      case "pending":
+        return { backgroundColor: "#fff3cd", color: "#856404" };
+      case "draft":
+        return { backgroundColor: "#e2e3e5", color: "#383d41" };
+      case "rejected":
+        return { backgroundColor: "#f8d7da", color: "#721c24" };
+      default:
+        return {};
+    }
+  };
+
   if (loading || !singlePost) return <Spinner />;
 
   return (
@@ -76,26 +91,39 @@ const PreviewPost = () => {
           zIndex: 100,
         }}
       >
-        <div className="container py-2 d-flex align-items-center justify-content-between">
+        <div className="container py-2 d-flex align-items-md-center justify-content-md-between flex-md-row flex-column
+        align-items-start gap-3 gap-md-0">
           <div className="d-flex align-items-center gap-3">
-            <Link
-              to="/dashboard/pending"
-              className="btn btn-sm fw-semibold d-flex align-items-center gap-1"
-              style={{
-                border: "1px solid var(--border)",
-                color: "var(--gray)",
-              }}
-            >
-              <FaArrowLeft size={11} /> Back to Pending
-            </Link>
+            {user?.roles === "admin" ? (
+              <Link
+                to="/dashboard/pending"
+                className="btn btn-sm fw-semibold d-flex align-items-center gap-1"
+                style={{
+                  border: "1px solid var(--border)",
+                  color: "var(--gray)",
+                }}
+              >
+                <FaArrowLeft size={11} /> Back to Pending
+              </Link>
+            ) : (
+              <Link
+                to="/dashboard/my-posts"
+                className="btn btn-sm fw-semibold d-flex align-items-center gap-1"
+                style={{
+                  border: "1px solid var(--border)",
+                  color: "var(--gray)",
+                }}
+              >
+                <FaArrowLeft size={11} /> Back to My Posts
+              </Link>
+            )}
             <span
               className="text-capitalize fw-bold"
               style={{
-                backgroundColor: "#fff3cd",
-                color: "#856404",
-                padding: "3px 10px",
+                ...getStatusStyle(singlePost.status),
+                padding: "2px 8px",
                 borderRadius: "20px",
-                fontSize: "12px",
+                fontSize: "11px",
               }}
             >
               {singlePost.status}

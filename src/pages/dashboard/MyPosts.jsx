@@ -17,10 +17,9 @@ const MyPosts = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
-  const [deleteSlug, setDeleteSlug] = useState(null); // stores slug of post to delete
-  const [deleteTitle, setDeleteTitle] = useState(""); // stores title for display in modal
+  const [deleteSlug, setDeleteSlug] = useState(null);
+  const [deleteTitle, setDeleteTitle] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/login");
@@ -42,13 +41,11 @@ const MyPosts = () => {
     fetchMyPosts();
   }, []);
 
-  // Open modal - just save the slug and title
   const openDeleteModal = (slug, title) => {
     setDeleteSlug(slug);
     setDeleteTitle(title);
   };
 
-  // Confirm delete from modal
   const handleDelete = async () => {
     setDeleteLoading(true);
     try {
@@ -58,7 +55,6 @@ const MyPosts = () => {
       setMessageType("success");
       setDeleteSlug(null);
       setDeleteTitle("");
-      // Close modal programmatically
       document.getElementById("closeDeleteModal").click();
     } catch (err) {
       setMessage("Failed to delete post");
@@ -70,16 +66,11 @@ const MyPosts = () => {
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case "published":
-        return { backgroundColor: "#d4edda", color: "#155724" };
-      case "pending":
-        return { backgroundColor: "#fff3cd", color: "#856404" };
-      case "draft":
-        return { backgroundColor: "#e2e3e5", color: "#383d41" };
-      case "rejected":
-        return { backgroundColor: "#f8d7da", color: "#721c24" };
-      default:
-        return {};
+      case "published": return { backgroundColor: "#d4edda", color: "#155724" };
+      case "pending":   return { backgroundColor: "#fff3cd", color: "#856404" };
+      case "draft":     return { backgroundColor: "#e2e3e5", color: "#383d41" };
+      case "rejected":  return { backgroundColor: "#f8d7da", color: "#721c24" };
+      default:          return {};
     }
   };
 
@@ -87,20 +78,21 @@ const MyPosts = () => {
 
   return (
     <div style={{ backgroundColor: "var(--bg)", minHeight: "100vh" }}>
-      <div className="container py-5">
+      <div className="container py-4 py-md-5">
+
         {/* HEADER */}
-        <div className="d-flex align-items-center justify-content-between mb-4">
+        <div className="d-flex align-items-start align-items-md-center justify-content-between mb-4 gap-3">
           <div>
-            <h4 className="fw-bold mb-0">
+            <h4 className="fw-bold mb-0 d-flex align-items-center gap-2">
               <IoNewspaper /> My Posts
             </h4>
-            <p style={{ color: "var(--gray)", fontSize: "14px" }}>
+            <p style={{ color: "var(--gray)", fontSize: "14px" }} className="mb-0">
               Manage all your articles and gist
             </p>
           </div>
           <Link
             to="/dashboard/create"
-            className="btn btn-sm fw-semibold text-white"
+            className="btn btn-sm fw-semibold text-white flex-shrink-0"
             style={{ backgroundColor: "var(--green)" }}
           >
             + Write New Post
@@ -117,9 +109,7 @@ const MyPosts = () => {
         {/* EMPTY STATE */}
         {posts.length === 0 && !loading && (
           <div className="text-center p-5 bg-white rounded shadow-sm">
-            <p style={{ fontSize: "40px" }}>
-              <TfiWrite />
-            </p>
+            <p style={{ fontSize: "40px" }}><TfiWrite /></p>
             <h6 className="fw-bold">No posts yet!</h6>
             <p style={{ color: "var(--gray)", fontSize: "14px" }}>
               You haven't written any posts yet. Start sharing your gist!
@@ -134,250 +124,185 @@ const MyPosts = () => {
           </div>
         )}
 
-        {/* POSTS TABLE */}
         {posts.length > 0 && (
-          <div className="bg-white rounded shadow-sm overflow-hidden">
-            <table className="table table-hover mb-0">
-              <thead style={{ backgroundColor: "var(--light-green)" }}>
-                <tr>
-                  <th
-                    style={{
-                      fontSize: "13px",
-                      color: "var(--green)",
-                      padding: "14px",
-                    }}
-                  >
-                    Post
-                  </th>
-                  <th style={{ fontSize: "13px", color: "var(--green)" }}>
-                    Category
-                  </th>
-                  <th style={{ fontSize: "13px", color: "var(--green)" }}>
-                    Status
-                  </th>
-                  <th style={{ fontSize: "13px", color: "var(--green)" }}>
-                    Views
-                  </th>
-                  <th style={{ fontSize: "13px", color: "var(--green)" }}>
-                    Date
-                  </th>
-                  <th style={{ fontSize: "13px", color: "var(--green)" }}>
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {posts.map((post) => (
-                  <tr key={post._id}>
-                    {/* TITLE & IMAGE */}
-                    <td style={{ padding: "14px" }}>
-                      <div className="d-flex align-items-center gap-3">
-                        <img
-                          src={
-                            post.image ||
-                            "https://placehold.co/60x40?text=No+Img"
-                          }
-                          alt={post.title}
-                          style={{
-                            width: "60px",
-                            height: "40px",
-                            objectFit: "cover",
-                            borderRadius: "4px",
-                            flexShrink: 0,
-                          }}
-                        />
-                        <p
-                          className="mb-0 fw-semibold"
-                          style={{
-                            fontSize: "13px",
-                            maxWidth: "200px",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {post.title}
-                        </p>
-                      </div>
-                    </td>
-
-                    {/* CATEGORY */}
-                    <td style={{ fontSize: "13px", verticalAlign: "middle" }}>
-                      <span className="text-capitalize">{post.category}</span>
-                    </td>
-
-                    {/* STATUS */}
-                    <td style={{ verticalAlign: "middle" }}>
-                      <span
-                        className="text-capitalize fw-semibold"
-                        style={{
-                          ...getStatusStyle(post.status),
-                          padding: "3px 10px",
-                          borderRadius: "20px",
-                          fontSize: "11px",
-                        }}
-                      >
-                        {post.status}
-                      </span>
-                    </td>
-
-                    {/* VIEWS */}
-                    <td style={{ fontSize: "13px", verticalAlign: "middle" }}>
-                      <FaEye size={12} color="var(--gray)" /> {post.views}
-                    </td>
-
-                    {/* DATE */}
-                    <td
-                      style={{
-                        fontSize: "12px",
-                        color: "var(--gray)",
-                        verticalAlign: "middle",
-                      }}
-                    >
-                      <FaClock size={10} />{" "}
-                      {new Date(post.createdAt).toLocaleDateString("en-NG")}
-                    </td>
-
-                    {/* ACTIONS */}
-                    <td style={{ verticalAlign: "middle" }}>
-                      <div className="d-flex gap-2">
+          <>
+            {/* ── DESKTOP TABLE (md and up) ── */}
+            <div className="d-none d-lg-block bg-white rounded shadow-sm overflow-hidden">
+              <table className="table table-hover mb-0">
+                <thead style={{ backgroundColor: "var(--light-green)" }}>
+                  <tr>
+                    <th style={{ fontSize: "13px", color: "var(--green)", padding: "14px" }}>Post</th>
+                    <th style={{ fontSize: "13px", color: "var(--green)" }}>Category</th>
+                    <th style={{ fontSize: "13px", color: "var(--green)" }}>Status</th>
+                    <th style={{ fontSize: "13px", color: "var(--green)" }}>Views</th>
+                    <th style={{ fontSize: "13px", color: "var(--green)" }}>Date</th>
+                    <th style={{ fontSize: "13px", color: "var(--green)" }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {posts.map((post) => (
+                    <tr key={post._id}>
+                      <td style={{ padding: "14px" }}>
+                        <div className="d-flex align-items-center gap-3">
+                          <img
+                            src={post.image || "https://placehold.co/60x40?text=No+Img"}
+                            alt={post.title}
+                            style={{ width: "60px", height: "40px", objectFit: "cover", borderRadius: "4px", flexShrink: 0 }}
+                          />
+                          <p className="mb-0 fw-semibold" style={{ fontSize: "13px", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {post.title}
+                          </p>
+                        </div>
+                      </td>
+                      <td style={{ fontSize: "13px", verticalAlign: "middle" }}>
+                        <span className="text-capitalize">{post.category}</span>
+                      </td>
+                      <td style={{ verticalAlign: "middle" }}>
+                        <span className="text-capitalize fw-semibold" style={{ ...getStatusStyle(post.status), padding: "3px 10px", borderRadius: "20px", fontSize: "11px" }}>
+                          {post.status}
+                        </span>
+                      </td>
+                      <td style={{ fontSize: "13px", verticalAlign: "middle" }}>
+                        <FaEye size={12} color="var(--gray)" /> {post.views}
+                      </td>
+                      <td style={{ fontSize: "12px", color: "var(--gray)", verticalAlign: "middle" }}>
+                        <FaClock size={10} /> {new Date(post.createdAt).toLocaleDateString("en-NG")}
+                      </td>
+                      <td style={{ verticalAlign: "middle" }}>
+                        <div className="d-flex gap-2">
                           <Link
                             to={`/dashboard/preview/${post.slug}`}
-                            className="btn btn-sm fw-semibold d-flex align-items-center justify-content-center gap-1"
-                            style={{
-                              border: "1px solid var(--green)",
-                              color: "var(--green)",
-                            }}
+                            className="btn btn-sm fw-semibold d-flex align-items-center gap-1"
+                            style={{ border: "1px solid var(--green)", color: "var(--green)" }}
                           >
                             <FaEye size={12} /> Preview
                           </Link>
-                        <Link
-                          to={`/dashboard/edit/${post.slug}`}
-                          className="btn btn-sm"
-                          style={{
-                            backgroundColor: "#fff3cd",
-                            color: "#856404",
-                            padding: "4px 8px",
-                          }}
-                          title="Edit"
-                        >
-                          <FaEdit size={12} />
-                        </Link>
-                        <button
-                          onClick={() => openDeleteModal(post.slug, post.title)}
-                          className="btn btn-sm"
-                          style={{
-                            backgroundColor: "#f8d7da",
-                            color: "var(--red)",
-                            padding: "4px 8px",
-                          }}
-                          title="Delete"
-                          data-bs-toggle="modal"
-                          data-bs-target="#deleteModal"
-                        >
-                          <FaTrash size={12} />
-                        </button>
+                          <Link
+                            to={`/dashboard/edit/${post.slug}`}
+                            className="btn btn-sm"
+                            style={{ backgroundColor: "#fff3cd", color: "#856404", padding: "4px 8px" }}
+                            title="Edit"
+                          >
+                            <FaEdit size={12} />
+                          </Link>
+                          <button
+                            onClick={() => openDeleteModal(post.slug, post.title)}
+                            className="btn btn-sm"
+                            style={{ backgroundColor: "#f8d7da", color: "var(--red)", padding: "4px 8px" }}
+                            title="Delete"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"
+                          >
+                            <FaTrash size={12} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* ── MOBILE CARDS (below md) ── */}
+            <div className="d-lg-none d-flex flex-column gap-3">
+              {posts.map((post) => (
+                <div key={post._id} className="bg-white rounded shadow-sm p-3">
+                  <div className="d-flex gap-3">
+                    {/* THUMBNAIL */}
+                    <img
+                      src={post.image || "https://placehold.co/70x50?text=No+Img"}
+                      alt={post.title}
+                      style={{ width: "70px", height: "50px", objectFit: "cover", borderRadius: "6px", flexShrink: 0 }}
+                    />
+
+                    {/* TITLE + BADGES */}
+                    <div className="flex-grow-1 overflow-hidden">
+                      <p className="fw-semibold mb-1" style={{ fontSize: "13px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {post.title}
+                      </p>
+                      <div className="d-flex align-items-center gap-2 flex-wrap">
+                        {/* STATUS */}
+                        <span className="text-capitalize fw-semibold" style={{ ...getStatusStyle(post.status), padding: "2px 8px", borderRadius: "20px", fontSize: "11px" }}>
+                          {post.status}
+                        </span>
+                        {/* CATEGORY */}
+                        <span className="text-capitalize" style={{ fontSize: "11px", color: "var(--gray)", backgroundColor: "var(--light-green)", padding: "2px 8px", borderRadius: "20px" }}>
+                          {post.category}
+                        </span>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </div>
+
+                  {/* META ROW */}
+                  <div className="d-flex align-items-center gap-3 mt-2" style={{ fontSize: "12px", color: "var(--gray)" }}>
+                    <span><FaEye size={11} /> {post.views} views</span>
+                    <span><FaClock size={10} /> {new Date(post.createdAt).toLocaleDateString("en-NG")}</span>
+                  </div>
+
+                  {/* ACTION BUTTONS */}
+                  <div className="d-flex gap-2 mt-3">
+                    <Link
+                      to={`/dashboard/preview/${post.slug}`}
+                      className="btn btn-sm fw-semibold flex-grow-1 d-flex align-items-center justify-content-center gap-1"
+                      style={{ border: "1px solid var(--green)", color: "var(--green)", fontSize: "12px" }}
+                    >
+                      <FaEye size={11} /> Preview
+                    </Link>
+                    <Link
+                      to={`/dashboard/edit/${post.slug}`}
+                      className="btn btn-sm flex-grow-1 d-flex align-items-center justify-content-center gap-1"
+                      style={{ backgroundColor: "#fff3cd", color: "#856404", fontSize: "12px" }}
+                    >
+                      <FaEdit size={11} /> Edit
+                    </Link>
+                    <button
+                      onClick={() => openDeleteModal(post.slug, post.title)}
+                      className="btn btn-sm"
+                      style={{ backgroundColor: "#f8d7da", color: "var(--red)", padding: "6px 12px" }}
+                      data-bs-toggle="modal"
+                      data-bs-target="#deleteModal"
+                    >
+                      <FaTrash size={11} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
 
       {/* DELETE CONFIRMATION MODAL */}
-      <div
-        className="modal fade"
-        id="deleteModal"
-        tabIndex="-1"
-        aria-labelledby="deleteModalLabel"
-        aria-hidden="true"
-      >
+      <div className="modal fade" id="deleteModal" tabIndex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered">
-          <div
-            className="modal-content"
-            style={{ borderRadius: "12px", border: "none" }}
-          >
-            {/* MODAL HEADER */}
+          <div className="modal-content" style={{ borderRadius: "12px", border: "none" }}>
             <div className="modal-header border-0 pb-0">
-              <h5
-                className="modal-title fw-bold"
-                id="deleteModalLabel"
-                style={{ color: "var(--text)" }}
-              >
+              <h5 className="modal-title fw-bold" id="deleteModalLabel" style={{ color: "var(--text)" }}>
                 <TbTrash /> Delete Post
               </h5>
-              <button
-                type="button"
-                className="btn-close"
-                id="closeDeleteModal"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              />
+              <button type="button" className="btn-close" id="closeDeleteModal" data-bs-dismiss="modal" aria-label="Close" />
             </div>
-
-            {/* MODAL BODY */}
             <div className="modal-body pt-2">
               <p style={{ color: "var(--gray)", fontSize: "14px" }}>
                 Are you sure you want to delete this post?
               </p>
-              <div
-                className="p-3 rounded"
-                style={{
-                  backgroundColor: "#f8d7da",
-                  border: "1px solid #f5c6cb",
-                }}
-              >
-                <p
-                  className="mb-0 fw-semibold"
-                  style={{ fontSize: "14px", color: "#721c24" }}
-                >
+              <div className="p-3 rounded" style={{ backgroundColor: "#f8d7da", border: "1px solid #f5c6cb" }}>
+                <p className="mb-0 fw-semibold" style={{ fontSize: "14px", color: "#721c24" }}>
                   "{deleteTitle}"
                 </p>
               </div>
-              <p
-                className="mt-3 mb-0"
-                style={{ color: "var(--red)", fontSize: "13px" }}
-              >
+              <p className="mt-3 mb-0" style={{ color: "var(--red)", fontSize: "13px" }}>
                 <BiInfoCircle /> This action cannot be undone!
               </p>
             </div>
-
-            {/* MODAL FOOTER */}
             <div className="modal-footer border-0 pt-0">
-              <button
-                type="button"
-                className="btn fw-semibold"
-                data-bs-dismiss="modal"
-                style={{
-                  border: "1px solid var(--border)",
-                  color: "var(--gray)",
-                  fontSize: "14px",
-                }}
-              >
+              <button type="button" className="btn fw-semibold" data-bs-dismiss="modal" style={{ border: "1px solid var(--border)", color: "var(--gray)", fontSize: "14px" }}>
                 Cancel
               </button>
-              <button
-                type="button"
-                className="btn fw-bold"
-                onClick={handleDelete}
-                disabled={deleteLoading}
-                style={{
-                  backgroundColor: "var(--red)",
-                  color: "white",
-                  fontSize: "14px",
-                }}
-              >
+              <button type="button" className="btn fw-bold" onClick={handleDelete} disabled={deleteLoading} style={{ backgroundColor: "var(--red)", color: "white", fontSize: "14px" }}>
                 {deleteLoading ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" />
-                    Deleting...
-                  </>
-                ) : (
-                  "Yes, Delete Post"
-                )}
+                  <><span className="spinner-border spinner-border-sm me-2" />Deleting...</>
+                ) : "Yes, Delete Post"}
               </button>
             </div>
           </div>
