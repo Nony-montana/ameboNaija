@@ -148,7 +148,7 @@ const Dashboard = () => {
           {/* ADMIN ONLY - PENDING POSTS */}
           {user?.roles === "admin" && (
             <div className="col-md-4">
-              <Link to="/dashboard/pending" style={{ textDecoration: "none" }}>
+              <Link to="/admin/dashboard" style={{ textDecoration: "none" }}>
                 <div
                   className="p-4 rounded shadow-sm h-100 bg-white d-flex flex-column align-items-center text-center"
                   style={{
@@ -174,7 +174,7 @@ const Dashboard = () => {
                     <FaUserShield size={24} color="#cc8800" />
                   </div>
                   <h6 className="fw-bold" style={{ color: "var(--text)" }}>
-                    Admin Panel
+                    Admin Dashboard
                   </h6>
                   <p style={{ fontSize: "13px", color: "var(--gray)" }}>
                     Review and approve pending posts

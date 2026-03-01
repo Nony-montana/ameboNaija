@@ -4,9 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import API from "../../api/axios";
 import Spinner from "../../components/Spinner";
 import MessageToast from "../../components/ui/MessageToast";
-import { FaEye, FaEdit, FaTrash, FaClock } from "react-icons/fa";
+import { FaEye, FaEdit, FaTrash, FaClock, FaNewspaper } from "react-icons/fa";
 import { TfiWrite } from "react-icons/tfi";
-import { IoNewspaper } from "react-icons/io5";
 import { TbTrash } from "react-icons/tb";
 import { BiInfoCircle } from "react-icons/bi";
 
@@ -84,7 +83,7 @@ const MyPosts = () => {
         <div className="d-flex align-items-start align-items-md-center justify-content-between mb-4 gap-3">
           <div>
             <h4 className="fw-bold mb-0 d-flex align-items-center gap-2">
-              <IoNewspaper /> My Posts
+              <FaNewspaper /> My Posts
             </h4>
             <p style={{ color: "var(--gray)", fontSize: "14px" }} className="mb-0">
               Manage all your articles and gist

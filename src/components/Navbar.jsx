@@ -5,6 +5,7 @@ import { FaSearch, FaUserCircle, FaPen } from "react-icons/fa";
 import { MdDashboard, MdLogout } from "react-icons/md";
 import { useState } from "react";
 import logo from "../assets/Logo.png";
+import { RxDashboard } from "react-icons/rx";
 
 const Navbar = () => {
   const { isLoggedIn, user } = useSelector((state) => state.auth);
@@ -150,9 +151,9 @@ const Navbar = () => {
                       <li>
                         <Link
                           className="dropdown-item d-flex align-items-center gap-2"
-                          to="/dashboard/pending"
+                          to="/admin/dashboard"
                         >
-                          <MdDashboard /> Admin Panel
+                          <RxDashboard /> Admin Dashboard
                         </Link>
                       </li>
                     )}
