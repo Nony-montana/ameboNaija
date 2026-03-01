@@ -88,11 +88,11 @@ const PendingPosts = () => {
             </p>
           </div>
           <Link
-            to="/dashboard"
+            to="/admin/dashboard"
             className="btn btn-sm fw-semibold"
             style={{ border: "1px solid var(--green)", color: "var(--green)" }}
           >
-            ← Back to Dashboard
+            ← Admin Dashboard
           </Link>
         </div>
 

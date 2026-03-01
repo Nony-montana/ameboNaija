@@ -3,9 +3,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import {
     FaUsers, FaNewspaper, FaChartBar,
-    FaHourglass, FaUserShield, FaTachometerAlt
+    FaHourglass, FaUserShield, FaTachometerAlt, FaComment
 } from "react-icons/fa";
-import { MdDashboard } from "react-icons/md";
 
 const adminNavItems = [
     {
@@ -43,6 +42,15 @@ const adminNavItems = [
         color: "#d97706",
         bg: "#fffbeb",
         border: "#fde68a",
+    },
+    {
+        to: "/admin/comments",
+        icon: <FaComment size={24} />,
+        label: "Comments",
+        description: "View and moderate all comments",
+        color: "#0891b2",
+        bg: "#ecfeff",
+        border: "#a5f3fc",
     },
 ];
 

@@ -71,7 +71,7 @@ const AdminOverview = () => {
                             <MdDashboard color="var(--green)" /> Admin Overview
                         </h4>
                         <p style={{ color: "var(--gray)", fontSize: "14px" }} className="mb-0">
-                            Welcome back, {user?.firstName} 👋
+                            Welcome back, {user?.firstName}
                         </p>
                     </div>
                     <Link

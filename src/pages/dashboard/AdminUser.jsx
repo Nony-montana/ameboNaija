@@ -41,7 +41,7 @@ const AdminUsers = () => {
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const res = await API.get("/admin/users", {
+            const res = await API.get("/getallusers", {
                 params: { page, limit: 15, search }
             });
             setUsers(res.data.data);

@@ -177,7 +177,7 @@ const Dashboard = () => {
                     Admin Dashboard
                   </h6>
                   <p style={{ fontSize: "13px", color: "var(--gray)" }}>
-                    Review and approve pending posts
+                   View and manage all users , posts and comments
                   </p>
                 </div>
               </Link>
