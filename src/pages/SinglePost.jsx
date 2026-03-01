@@ -272,7 +272,7 @@ const SinglePost = () => {
                                 )}
 
                                 {singlePost.comments?.map((c) => (
-                                    <div key={c.id} className="d-flex gap-3 mb-3 p-3 rounded" style={{ backgroundColor: "var(--light-green)" }}>
+                                    <div key={c._id} className="d-flex gap-3 mb-3 p-3 rounded" style={{ backgroundColor: "var(--light-green)" }}>
                                         <FaUserCircle size={28} color="var(--green)" className="flex-shrink-0 mt-1" />
                                         <div className="w-100">
 
@@ -286,22 +286,24 @@ const SinglePost = () => {
                                                         {formatDate(c.createdAt)}
                                                     </small>
 
-                                                    {/* EDIT — only comment owner, hidden while editing */}
-                                                    {user?.id === c.user?.id && editingCommentId !== c.id && (
+                                                    {/* EDIT — only comment owner, only within 10 mins, hidden while editing */}
+                                                    {user?.id === c.user?._id &&
+                                                     editingCommentId !== c._id &&
+                                                     (Date.now() - new Date(c.createdAt).getTime()) < 10 * 60 * 1000 && (
                                                         <button
-                                                            onClick={() => handleEditComment(c.id, c.text)}
+                                                            onClick={() => handleEditComment(c._id, c.text)}
                                                             className="btn btn-sm p-0"
                                                             style={{ color: "var(--green)", border: "none", background: "none" }}
-                                                            title="Edit comment"
+                                                            title="Edit comment (available for 10 mins)"
                                                         >
                                                             <FaEdit size={11} />
                                                         </button>
                                                     )}
 
-                                                    {/* DELETE — comment owner or admin, hidden while editing */}
-                                                    {(user?.id === c.user?.id || user?.roles === "admin") && editingCommentId !== c.id && (
+                                                    {/* DELETE — only comment owner or admin, hidden while editing */}
+                                                    {(user?.id === c.user?._id || user?.roles === "admin") && editingCommentId !== c._id && (
                                                         <button
-                                                            onClick={() => handleDeleteComment(c.id)}
+                                                            onClick={() => handleDeleteComment(c._id)}
                                                             className="btn btn-sm p-0"
                                                             style={{ color: "var(--red)", border: "none", background: "none" }}
                                                             title="Delete comment"
@@ -313,7 +315,7 @@ const SinglePost = () => {
                                             </div>
 
                                             {/* COMMENT BODY — normal view or inline edit */}
-                                            {editingCommentId === c.id ? (
+                                            {editingCommentId === c._id ? (
                                                 <div className="mt-2">
                                                     <textarea
                                                         className="form-control mb-2" rows={2} autoFocus
@@ -322,7 +324,7 @@ const SinglePost = () => {
                                                     />
                                                     <div className="d-flex gap-2">
                                                         <button
-                                                            onClick={() => handleSaveEdit(c.id)}
+                                                            onClick={() => handleSaveEdit(c._id)}
                                                             className="btn btn-sm fw-semibold d-flex align-items-center gap-1"
                                                             disabled={editLoading}
                                                             style={{ backgroundColor: "var(--green)", color: "white", fontSize: "12px" }}
@@ -342,9 +344,16 @@ const SinglePost = () => {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <p className="mb-0 mt-1" style={{ fontSize: "14px", color: "var(--text)" }}>
-                                                    {c.text}
-                                                </p>
+                                                <div>
+                                                    <p className="mb-0 mt-1" style={{ fontSize: "14px", color: "var(--text)" }}>
+                                                        {c.text}
+                                                    </p>
+                                                    {c.editedAt && (
+                                                        <small style={{ color: "var(--gray)", fontSize: "11px", fontStyle: "italic" }}>
+                                                            edited
+                                                        </small>
+                                                    )}
+                                                </div>
                                             )}
 
                                         </div>
