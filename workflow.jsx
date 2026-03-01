@@ -45,3 +45,26 @@
 //preview for users✅
 //the url should contain user id...✅
 //a page to fetch all posts in each category✅
+
+// What's Missing (to get to 9/10):
+// High Priority:
+
+// Email notifications — welcome email is done but you still need: post approved/rejected email to author, password reset confirmation
+// Notification system — bell icon showing when your post gets approved, someone likes/comments on your post
+// Pagination on homepage — if posts grow you need infinite scroll or page numbers
+// 404 page — you reference /404 in the code but likely haven't built it ✅
+// SEO — meta tags, og:image for social sharing (important for a blog)
+
+// Medium Priority:
+
+// Reading time — "5 min read" on each post, very standard for blogs
+// Related posts — show 3 posts from same category at bottom of single post
+// Author profile page — click on author name to see all their posts ✅
+// Save/Bookmark posts — users save posts to read later
+// Post views — you track views but need to make sure it only counts unique views, not every refresh
+
+// Nice to Have:
+// 11. Comment likes — like individual comments
+// 12. Search page — dedicated search results page ✅
+// 13. Dark mode — you have CSS variables set up already, halfway there
+// 14. Rate limiting on backend — prevent spam/abuse
