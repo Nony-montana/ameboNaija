@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
-import { FaFacebook, FaTwitter, FaInstagram, FaTiktok, FaWhatsapp } from "react-icons/fa";
+import { FaFacebook, FaTwitter, FaInstagram, FaTiktok, FaWhatsapp, FaHeart } from "react-icons/fa";
 import logo from "../assets/Logo.png";
-import { BiHeart } from "react-icons/bi";
 
 const Footer = () => {
     return (
@@ -140,10 +139,7 @@ const Footer = () => {
             <div style={{ backgroundColor: "#004d00", borderTop: "1px solid #005500" }}>
                 <div className="container py-3 d-flex flex-column flex-md-row justify-content-between align-items-center">
                     <small style={{ color: "#aaaaaa", fontSize: "13px" }}>
-                        © {new Date().getFullYear()} Amebo Naija. All rights reserved.
-                    </small>
-                    <small style={{ color: "#aaaaaa", fontSize: "13px" }}>
-                        Made with <BiHeart fill="red"/> in Nigeria 🇳🇬
+                        © {new Date().getFullYear()} Amebonaija 🇳🇬. All rights reserved.
                     </small>
                 </div>
             </div>

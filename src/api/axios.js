@@ -25,7 +25,7 @@ const cookies = new Cookies();
 
 const API = axios.create({
   baseURL:
-    "https://theamebonaija-backend.onrender.com/api/v1" ||
+    "https://theamebo-naija-backend.vercel.app/api/v1" ||
     "http://localhost:5000/api/v1",
 });
 

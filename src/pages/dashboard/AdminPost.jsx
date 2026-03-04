@@ -392,9 +392,9 @@ const AdminPosts = () => {
                     >
                       <div>
                         <FaEye /> {post.views} &nbsp;
-                        <FaHeart /> {post.likes?.length || 0} &nbsp; 💬{" "}
-                        {post.comments?.length || 0} &nbsp;
-                        <BiShare /> {post.share?.length || 0}
+                        <FaHeart color="var(--red)"/> {post.likes?.length || 0} &nbsp;
+                        💬 {post.comments?.length || 0} &nbsp;
+                        <BiShare /> {post.shares || 0}
                       </div>
                     </td>
                     {/* DATE */}
@@ -543,8 +543,12 @@ const AdminPosts = () => {
                     {post.status}
                   </span>
                   <small style={{ color: "var(--gray)", fontSize: "11px" }}>
-                    👁 {post.views} ❤️ {post.likes?.length || 0} 💬{" "}
-                    {post.comments?.length || 0}
+                    <div>
+                      <FaEye /> {post.views} &nbsp;
+                      <FaHeart  color="var(--red)"/> {post.likes?.length || 0} &nbsp; 💬{" "}
+                      {post.comments?.length || 0} &nbsp;
+                      <BiShare color="var(--green)"/> {post.shares || 0}
+                    </div>
                   </small>
                 </div>
                 <div className="d-flex gap-2 flex-wrap">

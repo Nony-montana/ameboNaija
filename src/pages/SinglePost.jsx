@@ -488,7 +488,7 @@ const SinglePost = () => {
                                       )}
 
                                     {/* DELETE — owner or admin */}
-                                    {(user?._id === c.user?._id ||
+                                    {(user?.id === c.user?._id ||
                                       user?.roles === "admin") && (
                                       <button
                                         onClick={() => {
