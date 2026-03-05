@@ -25,8 +25,8 @@ const cookies = new Cookies();
 
 const API = axios.create({
   baseURL:
-    "https://theamebo-naija-backend.vercel.app/api/v1" ||
-    "http://localhost:5000/api/v1",
+    "https://theamebo-naija.vercel.app/api/v1" ||
+    // "http://localhost:5000/api/v1",
 });
 
 // Request interceptor — automatically attach token from cookies to every request
