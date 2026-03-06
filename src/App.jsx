@@ -77,7 +77,7 @@ function App() {
           {/* Auth Routes */}
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Dashboard Routes (protected) */}
           <Route path="/dashboard" element={<Dashboard />} />
