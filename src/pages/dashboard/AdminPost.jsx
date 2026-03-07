@@ -184,8 +184,8 @@ const AdminPosts = () => {
               {total} total posts
             </p>
           </div>
-          <Link
-            to="/admin/overview"
+          <button
+            onClick={() => navigate(-1)}
             className="btn btn-sm fw-semibold"
             style={{
               border: "1px solid var(--green)",
@@ -193,8 +193,8 @@ const AdminPosts = () => {
               fontSize: "13px",
             }}
           >
-            ← Back to Overview
-          </Link>
+            ← Back
+          </button>
         </div>
 
         {message && (
@@ -392,8 +392,8 @@ const AdminPosts = () => {
                     >
                       <div>
                         <FaEye /> {post.views} &nbsp;
-                        <FaHeart color="var(--red)"/> {post.likes?.length || 0} &nbsp;
-                        💬 {post.comments?.length || 0} &nbsp;
+                        <FaHeart color="var(--red)" /> {post.likes?.length || 0}{" "}
+                        &nbsp; 💬 {post.comments?.length || 0} &nbsp;
                         <BiShare /> {post.shares || 0}
                       </div>
                     </td>
@@ -545,9 +545,9 @@ const AdminPosts = () => {
                   <small style={{ color: "var(--gray)", fontSize: "11px" }}>
                     <div>
                       <FaEye /> {post.views} &nbsp;
-                      <FaHeart  color="var(--red)"/> {post.likes?.length || 0} &nbsp; 💬{" "}
-                      {post.comments?.length || 0} &nbsp;
-                      <BiShare color="var(--green)"/> {post.shares || 0}
+                      <FaHeart color="var(--red)" /> {post.likes?.length || 0}{" "}
+                      &nbsp; 💬 {post.comments?.length || 0} &nbsp;
+                      <BiShare color="var(--green)" /> {post.shares || 0}
                     </div>
                   </small>
                 </div>

@@ -105,7 +105,7 @@ const ForgotPassword = () => {
 
     return (
         <div
-            style={{ backgroundColor: "var(--bg)", minHeight: "100vh" }}
+            style={{ backgroundColor: "var(--bg)", minHeight: "60vh" }}
             className="d-flex align-items-center justify-content-center px-3"
         >
             <div className="bg-white rounded shadow-sm p-4 p-md-5" style={{ width: "100%", maxWidth: "440px" }}>
