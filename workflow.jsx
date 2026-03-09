@@ -53,11 +53,11 @@
 // Notification system — bell icon showing when your post gets approved, someone likes/comments on your post
 // Pagination on homepage — if posts grow you need infinite scroll or page numbers
 // 404 page — you reference /404 in the code but likely haven't built it ✅
-// SEO — meta tags, og:image for social sharing (important for a blog)
+// SEO — meta tags, og:image for social sharing (important for a blog) ✅
 
 // Medium Priority:
 
-// Reading time — "5 min read" on each post, very standard for blogs
+// Reading time — "5 min read" on each post, very standard for blogs ✅
 // Related posts — show 3 posts from same category at bottom of single post
 // Author profile page — click on author name to see all their posts ✅
 // Save/Bookmark posts — users save posts to read later
@@ -68,3 +68,4 @@
 // 12. Search page — dedicated search results page ✅
 // 13. Dark mode — you have CSS variables set up already, halfway there
 // 14. Rate limiting on backend — prevent spam/abuse
+//share
