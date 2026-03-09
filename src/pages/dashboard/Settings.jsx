@@ -344,8 +344,8 @@ const Settings = () => {
                                                     <input
                                                         type="text"
                                                         style={inputStyle}
-                                                        placeholder="Enter 4-digit OTP"
-                                                        maxLength={4}
+                                                        placeholder="Enter 6-digit OTP"
+                                                        maxLength={6}
                                                         value={passwordForm.otp}
                                                         onChange={(e) => setPasswordForm({ ...passwordForm, otp: e.target.value })}
                                                     />
