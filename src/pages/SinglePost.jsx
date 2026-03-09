@@ -411,7 +411,7 @@ const SinglePost = () => {
                             <small style={{ color: "var(--gray)", fontSize: "11px" }}>
                               {formatDate(c.createdAt)}
                             </small>
-                            {(user?._id === c.user?._id || user?.roles === "admin") && editingCommentId !== c._id && (
+                            {(user?.id === c.user?._id || user?.roles === "admin") && editingCommentId !== c._id && (
                               <div className="position-relative">
                                 <FaEllipsisV id="click" size={13}
                                   style={{ cursor: "pointer", color: "var(--gray)" }}
@@ -420,7 +420,7 @@ const SinglePost = () => {
                                 {openMenuId === c._id && (
                                   <div className="position-absolute bg-white rounded shadow-sm d-flex flex-column"
                                     style={{ right: 0, top: "20px", zIndex: 10, minWidth: "110px", border: "1px solid var(--border)" }}>
-                                    {user?._id === c.user?._id && Date.now() - new Date(c.createdAt).getTime() < 10 * 60 * 1000 && (
+                                    {user?.id === c.user?._id && Date.now() - new Date(c.createdAt).getTime() < 10 * 60 * 1000 && (
                                       <button onClick={() => { handleEditComment(c._id, c.text); setOpenMenuId(null); }}
                                         className="btn btn-sm text-start d-flex justify-content-between align-items-center gap-2 px-3 py-2"
                                         style={{ color: "var(--green)", border: "none", background: "none", fontSize: "13px", borderBottom: "1px solid var(--border)" }}>
