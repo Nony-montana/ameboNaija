@@ -26,7 +26,8 @@ import AdminUsers from "./pages/dashboard/AdminUser";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import AdminComments from "./pages/dashboard/AdminComment";
 import AuthorProfile from "./pages/AuthorPage";
-import Bookmarks from "./pages/dashboard/Bookmark.sjsx";
+import Bookmarks from "./pages/dashboard/Bookmarks";
+
 // import { setUser, logout } from "./store/slices/authSlice";
 // import API from "./api/axios";
 
