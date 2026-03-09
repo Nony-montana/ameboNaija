@@ -60,7 +60,7 @@
 // Reading time — "5 min read" on each post, very standard for blogs ✅
 // Related posts — show 3 posts from same category at bottom of single post ✅
 // Author profile page — click on author name to see all their posts ✅
-// Save/Bookmark posts — users save posts to read later
+// Save/Bookmark posts — users save posts to read later ✅
 // Post views — you track views but need to make sure it only counts unique views, not every refresh
 
 // Nice to Have:

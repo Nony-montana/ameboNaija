@@ -97,7 +97,7 @@ const Category = () => {
                         <div className="row g-4">
                             {posts.map((post) => (
                                 <div className="col-md-6 col-lg-4" key={post._id}>
-                                    <PostCard post={post} />
+                                   <PostCard post={post} savedIds={savedIds} />
                                 </div>
                             ))}
                         </div>

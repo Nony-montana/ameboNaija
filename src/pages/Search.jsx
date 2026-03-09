@@ -130,7 +130,7 @@ const Search = () => {
                         <div className="row g-4">
                             {results.map((post) => (
                                 <div className="col-md-6 col-lg-4" key={post._id}>
-                                    <PostCard post={post} />
+                                   <PostCard post={post} savedIds={savedIds} />
                                 </div>
                             ))}
                         </div>

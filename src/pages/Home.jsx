@@ -190,7 +190,7 @@ const Home = () => {
               <div className="row g-3">
                 {gridPosts.map((post) => (
                   <div className="col-md-6" key={post._id}>
-                    <PostCard post={post} />
+                   <PostCard post={post} savedIds={savedIds} />
                   </div>
                 ))}
               </div>
