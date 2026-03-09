@@ -26,6 +26,7 @@ import AdminUsers from "./pages/dashboard/AdminUser";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import AdminComments from "./pages/dashboard/AdminComment";
 import AuthorProfile from "./pages/AuthorPage";
+import Bookmarks from "./pages/dashboard/Bookmark.sjsx";
 // import { setUser, logout } from "./store/slices/authSlice";
 // import API from "./api/axios";
 
@@ -80,6 +81,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/author/:id" element={<AuthorProfile />} />
+          <Route path="/dashboard/bookmarks" element={<Bookmarks />} />
 
           {/* Dashboard Routes (protected) */}
           <Route path="/dashboard" element={<Dashboard />} />

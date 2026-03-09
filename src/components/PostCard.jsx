@@ -1,13 +1,32 @@
 import { Link } from "react-router-dom";
-import { FaEye, FaHeart, FaClock } from "react-icons/fa";
+import { FaEye, FaHeart, FaClock, FaBookmark, FaRegBookmark } from "react-icons/fa";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import API from "../api/axios";
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post, savedIds = [] }) => {
+    const { isLoggedIn } = useSelector((state) => state.auth);
+    const [bookmarked, setBookmarked] = useState(savedIds.includes(post._id));
+    const [bookmarkLoading, setBookmarkLoading] = useState(false);
+
     const formatDate = (date) => {
         return new Date(date).toLocaleDateString("en-NG", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
+            day: "numeric", month: "short", year: "numeric",
         });
+    };
+
+    const handleBookmark = async (e) => {
+        e.preventDefault(); // prevent navigating to post
+        if (!isLoggedIn) return;
+        setBookmarkLoading(true);
+        try {
+            const res = await API.post(`/bookmark/${post._id}`);
+            setBookmarked(res.data.bookmarked);
+        } catch {
+            console.log("Bookmark failed");
+        } finally {
+            setBookmarkLoading(false);
+        }
     };
 
     return (
@@ -25,14 +44,30 @@ const PostCard = ({ post }) => {
                 <span
                     className="position-absolute top-0 start-0 m-2 text-white text-capitalize fw-bold"
                     style={{
-                        backgroundColor: "var(--green)",
-                        fontSize: "11px",
-                        padding: "3px 8px",
-                        borderRadius: "4px"
+                        backgroundColor: "var(--green)", fontSize: "11px",
+                        padding: "3px 8px", borderRadius: "4px",
                     }}
                 >
                     {post.category}
                 </span>
+
+                {/* BOOKMARK BUTTON */}
+                {isLoggedIn && (
+                    <button
+                        onClick={handleBookmark}
+                        disabled={bookmarkLoading}
+                        title={bookmarked ? "Remove bookmark" : "Save post"}
+                        className="position-absolute top-0 end-0 m-2 btn btn-sm"
+                        style={{
+                            backgroundColor: "rgba(0,0,0,0.55)", border: "none",
+                            color: bookmarked ? "#fbbf24" : "white",
+                            borderRadius: "6px", padding: "4px 8px",
+                            transition: "color 0.2s",
+                        }}
+                    >
+                        {bookmarked ? <FaBookmark size={13} /> : <FaRegBookmark size={13} />}
+                    </button>
+                )}
             </div>
 
             {/* POST BODY */}
@@ -42,13 +77,11 @@ const PostCard = ({ post }) => {
                     <h6
                         className="card-title fw-bold"
                         style={{
-                            color: "var(--text)",
-                            fontSize: "15px",
-                            lineHeight: "1.5",
+                            color: "var(--text)", fontSize: "15px", lineHeight: "1.5",
                             display: "-webkit-box",
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: "vertical",
-                            overflow: "hidden"
+                            overflow: "hidden",
                         }}
                         onMouseEnter={(e) => e.target.style.color = "var(--green)"}
                         onMouseLeave={(e) => e.target.style.color = "var(--text)"}
