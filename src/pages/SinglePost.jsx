@@ -11,8 +11,17 @@ import {
 import Spinner from "../components/Spinner";
 import MessageToast from "../components/ui/MessageToast";
 import {
-  FaEye, FaHeart, FaShareAlt, FaClock, FaUserCircle,
-  FaTrash, FaComment, FaEdit, FaCheck, FaTimes, FaEllipsisV,
+  FaEye,
+  FaHeart,
+  FaShareAlt,
+  FaClock,
+  FaUserCircle,
+  FaTrash,
+  FaComment,
+  FaEdit,
+  FaCheck,
+  FaTimes,
+  FaEllipsisV,
 } from "react-icons/fa";
 
 // ─── READING TIME HELPER ───────────────────────────────────────────
@@ -73,7 +82,9 @@ const SinglePost = () => {
     const fetchRelated = async () => {
       if (!singlePost?.category) return;
       try {
-        const res = await API.get(`/posts?category=${singlePost.category}&limit=4`);
+        const res = await API.get(
+          `/posts?category=${singlePost.category}&limit=4`,
+        );
         // Exclude the current post from related list
         const filtered = res.data.data
           .filter((p) => p.slug !== slug)
@@ -88,7 +99,9 @@ const SinglePost = () => {
 
   const formatDate = (date) =>
     new Date(date).toLocaleDateString("en-NG", {
-      day: "numeric", month: "long", year: "numeric",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
     });
 
   const refreshPost = async () => {
@@ -103,12 +116,15 @@ const SinglePost = () => {
   };
 
   const handleLike = async () => {
-    if (!isLoggedIn) return showMessage("Please login to like this post", "error");
+    if (!isLoggedIn)
+      return showMessage("Please login to like this post", "error");
     try {
       const res = await API.post(`/posts/${slug}/like`);
       setLiked(!liked);
       setLikeCount(res.data.totalLikes);
-    } catch { showMessage("Failed to like post", "error"); }
+    } catch {
+      showMessage("Failed to like post", "error");
+    }
   };
 
   const handleShare = async () => {
@@ -117,7 +133,9 @@ const SinglePost = () => {
       setShareCount(shareCount + 1);
       navigator.clipboard.writeText(window.location.href);
       showMessage("Link copied to clipboard!", "success");
-    } catch { showMessage("Failed to share post", "error"); }
+    } catch {
+      showMessage("Failed to share post", "error");
+    }
   };
 
   const handleComment = async (e) => {
@@ -130,8 +148,11 @@ const SinglePost = () => {
       setComment("");
       showMessage("Comment added successfully!", "success");
       await refreshPost();
-    } catch { showMessage("Failed to add comment", "error"); }
-    finally { setCommentLoading(false); }
+    } catch {
+      showMessage("Failed to add comment", "error");
+    } finally {
+      setCommentLoading(false);
+    }
   };
 
   const handleDeleteComment = async (commentId) => {
@@ -139,7 +160,9 @@ const SinglePost = () => {
       await API.delete(`/posts/${slug}/comment/${commentId}`);
       showMessage("Comment deleted", "success");
       await refreshPost();
-    } catch { showMessage("Failed to delete comment", "error"); }
+    } catch {
+      showMessage("Failed to delete comment", "error");
+    }
   };
 
   const handleEditComment = (commentId, currentText) => {
@@ -147,10 +170,14 @@ const SinglePost = () => {
     setEditText(currentText);
   };
 
-  const handleCancelEdit = () => { setEditingCommentId(null); setEditText(""); };
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditText("");
+  };
 
   const handleSaveEdit = async (commentId) => {
-    if (!editText.trim()) return showMessage("Comment cannot be empty", "error");
+    if (!editText.trim())
+      return showMessage("Comment cannot be empty", "error");
     setEditLoading(true);
     try {
       await API.put(`/posts/${slug}/comment/${commentId}`, { text: editText });
@@ -159,8 +186,13 @@ const SinglePost = () => {
       showMessage("Comment updated!", "success");
       await refreshPost();
     } catch (err) {
-      showMessage(err.response?.data?.message || "Failed to update comment", "error");
-    } finally { setEditLoading(false); }
+      showMessage(
+        err.response?.data?.message || "Failed to update comment",
+        "error",
+      );
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -174,7 +206,8 @@ const SinglePost = () => {
   // ─── SEO VALUES ────────────────────────────────────────────────
   const pageTitle = `${singlePost.title} | AmeboNaija`;
   const pageDescription = getExcerpt(singlePost.content);
-  const pageImage = singlePost.image || "https://amebonaija.vercel.app/logo.png";
+  const pageImage =
+    singlePost.image || "https://amebonaija.vercel.app/logo.png";
   const pageUrl = `https://amebonaija.vercel.app/post/${slug}`;
   const readingTime = getReadingTime(singlePost.content);
 
@@ -190,8 +223,14 @@ const SinglePost = () => {
         <meta property="og:image" content={pageImage} />
         <meta property="og:url" content={pageUrl} />
         <meta property="og:site_name" content="AmeboNaija" />
-        <meta property="article:published_time" content={singlePost.createdAt} />
-        <meta property="article:author" content={`${singlePost.author?.firstName} ${singlePost.author?.lastName}`} />
+        <meta
+          property="article:published_time"
+          content={singlePost.createdAt}
+        />
+        <meta
+          property="article:author"
+          content={`${singlePost.author?.firstName} ${singlePost.author?.lastName}`}
+        />
         <meta property="article:section" content={singlePost.category} />
         {singlePost.tags?.map((tag, i) => (
           <meta key={i} property="article:tag" content={tag} />
@@ -208,16 +247,18 @@ const SinglePost = () => {
             {/* LEFT - MAIN CONTENT */}
             <div className="col-lg-8">
               <div className="bg-white rounded shadow-sm p-4">
-
                 {/* CATEGORY, DATE & READING TIME */}
                 <div className="d-flex align-items-center gap-2 mb-3">
                   <Link
                     to={`/category/${singlePost.category}`}
                     className="text-capitalize fw-bold"
                     style={{
-                      backgroundColor: "var(--green)", color: "white",
-                      padding: "3px 10px", borderRadius: "4px",
-                      fontSize: "12px", textDecoration: "none",
+                      backgroundColor: "var(--green)",
+                      color: "white",
+                      padding: "3px 10px",
+                      borderRadius: "4px",
+                      fontSize: "12px",
+                      textDecoration: "none",
                     }}
                   >
                     {singlePost.category}
@@ -231,7 +272,14 @@ const SinglePost = () => {
                 </div>
 
                 {/* TITLE */}
-                <h1 className="fw-bold" style={{ fontSize: "26px", lineHeight: "1.4", color: "var(--text)" }}>
+                <h1
+                  className="fw-bold"
+                  style={{
+                    fontSize: "26px",
+                    lineHeight: "1.4",
+                    color: "var(--text)",
+                  }}
+                >
                   {singlePost.title}
                 </h1>
 
@@ -239,9 +287,21 @@ const SinglePost = () => {
                 <div className="d-flex align-items-center gap-2 my-3">
                   <FaUserCircle size={32} color="var(--green)" />
                   <div>
-                    <p className="mb-0 fw-semibold" style={{ fontSize: "14px" }}>
+                    {/* <p className="mb-0 fw-semibold" style={{ fontSize: "14px" }}>
                       {singlePost.author?.firstName} {singlePost.author?.lastName}
-                    </p>
+                    </p> */}
+                    <Link
+                      to={`/author/${singlePost.author?._id}`}
+                      style={{ textDecoration: "none", color: "inherit" }}
+                    >
+                      <p
+                        className="mb-0 fw-semibold"
+                        style={{ fontSize: "14px" }}
+                      >
+                        {singlePost.author?.firstName}{" "}
+                        {singlePost.author?.lastName}
+                      </p>
+                    </Link>
                     <small style={{ color: "var(--gray)", fontSize: "12px" }}>
                       {formatDate(singlePost.createdAt)}
                     </small>
@@ -250,10 +310,18 @@ const SinglePost = () => {
 
                 {/* COVER IMAGE */}
                 {singlePost.image && (
-                  <div className="mb-4" style={{ borderRadius: "8px", overflow: "hidden" }}>
+                  <div
+                    className="mb-4"
+                    style={{ borderRadius: "8px", overflow: "hidden" }}
+                  >
                     <img
-                      src={singlePost.image} alt={singlePost.title}
-                      style={{ width: "100%", maxHeight: "450px", objectFit: "cover" }}
+                      src={singlePost.image}
+                      alt={singlePost.title}
+                      style={{
+                        width: "100%",
+                        maxHeight: "450px",
+                        objectFit: "cover",
+                      }}
                     />
                   </div>
                 )}
@@ -262,40 +330,68 @@ const SinglePost = () => {
                 {singlePost.tags?.length > 0 && (
                   <div className="d-flex flex-wrap gap-2 mb-3">
                     {singlePost.tags.map((tag, i) => (
-                      <span key={i} style={{
-                        backgroundColor: "var(--light-green)", color: "var(--green)",
-                        padding: "3px 10px", borderRadius: "20px", fontSize: "12px", fontWeight: "600",
-                      }}>#{tag}</span>
+                      <span
+                        key={i}
+                        style={{
+                          backgroundColor: "var(--light-green)",
+                          color: "var(--green)",
+                          padding: "3px 10px",
+                          borderRadius: "20px",
+                          fontSize: "12px",
+                          fontWeight: "600",
+                        }}
+                      >
+                        #{tag}
+                      </span>
                     ))}
                   </div>
                 )}
 
                 {/* CONTENT */}
-                <div style={{
-                  fontSize: "16px", lineHeight: "1.9", color: "var(--text)",
-                  borderTop: "1px solid var(--border)", paddingTop: "20px",
-                }}>
+                <div
+                  style={{
+                    fontSize: "16px",
+                    lineHeight: "1.9",
+                    color: "var(--text)",
+                    borderTop: "1px solid var(--border)",
+                    paddingTop: "20px",
+                  }}
+                >
                   {singlePost.content}
                 </div>
 
                 {/* STATS & ACTIONS */}
-                <div className="d-flex align-items-center gap-3 mt-4 pt-3" style={{ borderTop: "1px solid var(--border)" }}>
+                <div
+                  className="d-flex align-items-center gap-3 mt-4 pt-3"
+                  style={{ borderTop: "1px solid var(--border)" }}
+                >
                   <span style={{ color: "var(--gray)", fontSize: "14px" }}>
                     <FaEye size={14} /> {singlePost.views} views
                   </span>
-                  <button onClick={handleLike} className="btn btn-sm d-flex align-items-center gap-1"
+                  <button
+                    onClick={handleLike}
+                    className="btn btn-sm d-flex align-items-center gap-1"
                     style={{
                       backgroundColor: liked ? "#ffe6e6" : "var(--light-green)",
                       color: liked ? "var(--red)" : "var(--green)",
-                      border: "none", fontWeight: "600", fontSize: "13px",
-                    }}>
+                      border: "none",
+                      fontWeight: "600",
+                      fontSize: "13px",
+                    }}
+                  >
                     <FaHeart /> {likeCount} {liked ? "Liked" : "Like"}
                   </button>
-                  <button onClick={handleShare} className="btn btn-sm d-flex align-items-center gap-1"
+                  <button
+                    onClick={handleShare}
+                    className="btn btn-sm d-flex align-items-center gap-1"
                     style={{
-                      backgroundColor: "var(--light-green)", color: "var(--green)",
-                      border: "none", fontWeight: "600", fontSize: "13px",
-                    }}>
+                      backgroundColor: "var(--light-green)",
+                      color: "var(--green)",
+                      border: "none",
+                      fontWeight: "600",
+                      fontSize: "13px",
+                    }}
+                  >
                     <FaShareAlt /> {shareCount} Share
                   </button>
                 </div>
@@ -308,10 +404,19 @@ const SinglePost = () => {
 
                 {/* ─── RELATED POSTS ─────────────────────────────────────── */}
                 {relatedPosts.length > 0 && (
-                  <div className="mt-4 pt-3" style={{ borderTop: "1px solid var(--border)" }}>
-                    <h6 className="fw-bold mb-3" style={{ color: "var(--text)" }}>
+                  <div
+                    className="mt-4 pt-3"
+                    style={{ borderTop: "1px solid var(--border)" }}
+                  >
+                    <h6
+                      className="fw-bold mb-3"
+                      style={{ color: "var(--text)" }}
+                    >
                       More{" "}
-                      <span className="text-capitalize" style={{ color: "var(--green)" }}>
+                      <span
+                        className="text-capitalize"
+                        style={{ color: "var(--green)" }}
+                      >
                         {singlePost.category}
                       </span>{" "}
                       Gist
@@ -330,8 +435,14 @@ const SinglePost = () => {
                                 transition: "background 0.2s",
                                 backgroundColor: "white",
                               }}
-                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--light-green)"}
-                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "white"}
+                              onMouseEnter={(e) =>
+                                (e.currentTarget.style.backgroundColor =
+                                  "var(--light-green)")
+                              }
+                              onMouseLeave={(e) =>
+                                (e.currentTarget.style.backgroundColor =
+                                  "white")
+                              }
                             >
                               {/* THUMBNAIL */}
                               {post.image && (
@@ -339,27 +450,40 @@ const SinglePost = () => {
                                   src={post.image}
                                   alt={post.title}
                                   style={{
-                                    width: "90px", height: "70px",
-                                    objectFit: "cover", borderRadius: "6px",
+                                    width: "90px",
+                                    height: "70px",
+                                    objectFit: "cover",
+                                    borderRadius: "6px",
                                     flexShrink: 0,
                                   }}
                                 />
                               )}
                               {/* TEXT */}
                               <div className="d-flex flex-column justify-content-center">
-                                <p className="mb-1 fw-semibold" style={{
-                                  fontSize: "13px", color: "var(--text)",
-                                  lineHeight: "1.4",
-                                  display: "-webkit-box",
-                                  WebkitLineClamp: 2,
-                                  WebkitBoxOrient: "vertical",
-                                  overflow: "hidden",
-                                }}>
+                                <p
+                                  className="mb-1 fw-semibold"
+                                  style={{
+                                    fontSize: "13px",
+                                    color: "var(--text)",
+                                    lineHeight: "1.4",
+                                    display: "-webkit-box",
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: "vertical",
+                                    overflow: "hidden",
+                                  }}
+                                >
                                   {post.title}
                                 </p>
-                                <small style={{ color: "var(--gray)", fontSize: "11px" }}>
-                                  <FaClock size={9} /> {formatDate(post.createdAt)}
-                                  {" · "}{getReadingTime(post.content)}
+                                <small
+                                  style={{
+                                    color: "var(--gray)",
+                                    fontSize: "11px",
+                                  }}
+                                >
+                                  <FaClock size={9} />{" "}
+                                  {formatDate(post.createdAt)}
+                                  {" · "}
+                                  {getReadingTime(post.content)}
                                 </small>
                               </div>
                             </div>
@@ -371,7 +495,10 @@ const SinglePost = () => {
                 )}
 
                 {/* COMMENTS SECTION */}
-                <div className="mt-4 pt-3" style={{ borderTop: "1px solid var(--border)" }}>
+                <div
+                  className="mt-4 pt-3"
+                  style={{ borderTop: "1px solid var(--border)" }}
+                >
                   <h6 className="fw-bold mb-3 d-flex align-items-center gap-2">
                     <FaComment color="var(--green)" />
                     Comments ({singlePost.comments?.length || 0})
@@ -379,16 +506,39 @@ const SinglePost = () => {
 
                   <form onSubmit={handleComment} className="mb-4">
                     <textarea
-                      className="form-control mb-2" rows={3}
-                      placeholder={isLoggedIn ? "Share your thoughts..." : "Login to leave a comment"}
-                      value={comment} onChange={(e) => setComment(e.target.value)}
+                      className="form-control mb-2"
+                      rows={3}
+                      placeholder={
+                        isLoggedIn
+                          ? "Share your thoughts..."
+                          : "Login to leave a comment"
+                      }
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
                       disabled={!isLoggedIn}
-                      style={{ fontSize: "14px", borderColor: "var(--border)", resize: "none" }}
+                      style={{
+                        fontSize: "14px",
+                        borderColor: "var(--border)",
+                        resize: "none",
+                      }}
                     />
-                    <button type="submit" className="btn btn-sm fw-semibold"
+                    <button
+                      type="submit"
+                      className="btn btn-sm fw-semibold"
                       disabled={commentLoading || !isLoggedIn}
-                      style={{ backgroundColor: "var(--green)", color: "white" }}>
-                      {commentLoading ? <><span className="spinner-border spinner-border-sm me-1" />Posting...</> : "Post Comment"}
+                      style={{
+                        backgroundColor: "var(--green)",
+                        color: "white",
+                      }}
+                    >
+                      {commentLoading ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-1" />
+                          Posting...
+                        </>
+                      ) : (
+                        "Post Comment"
+                      )}
                     </button>
                   </form>
 
@@ -399,72 +549,168 @@ const SinglePost = () => {
                   )}
 
                   {singlePost.comments?.map((c) => (
-                    <div key={c._id} className="d-flex gap-3 mb-3 p-3 rounded"
-                      style={{ backgroundColor: "var(--light-green)" }}>
-                      <FaUserCircle size={28} color="var(--green)" className="flex-shrink-0 mt-1" />
+                    <div
+                      key={c._id}
+                      className="d-flex gap-3 mb-3 p-3 rounded"
+                      style={{ backgroundColor: "var(--light-green)" }}
+                    >
+                      <FaUserCircle
+                        size={28}
+                        color="var(--green)"
+                        className="flex-shrink-0 mt-1"
+                      />
                       <div className="w-100">
                         <div className="d-flex justify-content-between align-items-center">
-                          <p className="mb-0 fw-semibold" style={{ fontSize: "13px" }}>
+                          <p
+                            className="mb-0 fw-semibold"
+                            style={{ fontSize: "13px" }}
+                          >
                             {c.user?.firstName} {c.user?.lastName}
                           </p>
                           <div className="d-flex align-items-center gap-2">
-                            <small style={{ color: "var(--gray)", fontSize: "11px" }}>
+                            <small
+                              style={{ color: "var(--gray)", fontSize: "11px" }}
+                            >
                               {formatDate(c.createdAt)}
                             </small>
-                            {(user?.id === c.user?._id || user?.roles === "admin") && editingCommentId !== c._id && (
-                              <div className="position-relative">
-                                <FaEllipsisV id="click" size={13}
-                                  style={{ cursor: "pointer", color: "var(--gray)" }}
-                                  onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === c._id ? null : c._id); }}
-                                />
-                                {openMenuId === c._id && (
-                                  <div className="position-absolute bg-white rounded shadow-sm d-flex flex-column"
-                                    style={{ right: 0, top: "20px", zIndex: 10, minWidth: "110px", border: "1px solid var(--border)" }}>
-                                    {user?.id === c.user?._id && Date.now() - new Date(c.createdAt).getTime() < 10 * 60 * 1000 && (
-                                      <button onClick={() => { handleEditComment(c._id, c.text); setOpenMenuId(null); }}
-                                        className="btn btn-sm text-start d-flex justify-content-between align-items-center gap-2 px-3 py-2"
-                                        style={{ color: "var(--green)", border: "none", background: "none", fontSize: "13px", borderBottom: "1px solid var(--border)" }}>
-                                        <span>Edit</span><FaEdit size={11} />
-                                      </button>
-                                    )}
-                                    {(user?.id === c.user?._id || user?.roles === "admin") && (
-                                      <button onClick={() => { handleDeleteComment(c._id); setOpenMenuId(null); }}
-                                        className="btn btn-sm text-start justify-content-between d-flex align-items-center gap-2 px-3 py-2"
-                                        style={{ color: "var(--red)", border: "none", background: "none", fontSize: "13px" }}>
-                                        <span>Delete</span><FaTrash size={11} />
-                                      </button>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                            {(user?.id === c.user?._id ||
+                              user?.roles === "admin") &&
+                              editingCommentId !== c._id && (
+                                <div className="position-relative">
+                                  <FaEllipsisV
+                                    id="click"
+                                    size={13}
+                                    style={{
+                                      cursor: "pointer",
+                                      color: "var(--gray)",
+                                    }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setOpenMenuId(
+                                        openMenuId === c._id ? null : c._id,
+                                      );
+                                    }}
+                                  />
+                                  {openMenuId === c._id && (
+                                    <div
+                                      className="position-absolute bg-white rounded shadow-sm d-flex flex-column"
+                                      style={{
+                                        right: 0,
+                                        top: "20px",
+                                        zIndex: 10,
+                                        minWidth: "110px",
+                                        border: "1px solid var(--border)",
+                                      }}
+                                    >
+                                      {user?.id === c.user?._id &&
+                                        Date.now() -
+                                          new Date(c.createdAt).getTime() <
+                                          10 * 60 * 1000 && (
+                                          <button
+                                            onClick={() => {
+                                              handleEditComment(c._id, c.text);
+                                              setOpenMenuId(null);
+                                            }}
+                                            className="btn btn-sm text-start d-flex justify-content-between align-items-center gap-2 px-3 py-2"
+                                            style={{
+                                              color: "var(--green)",
+                                              border: "none",
+                                              background: "none",
+                                              fontSize: "13px",
+                                              borderBottom:
+                                                "1px solid var(--border)",
+                                            }}
+                                          >
+                                            <span>Edit</span>
+                                            <FaEdit size={11} />
+                                          </button>
+                                        )}
+                                      {(user?.id === c.user?._id ||
+                                        user?.roles === "admin") && (
+                                        <button
+                                          onClick={() => {
+                                            handleDeleteComment(c._id);
+                                            setOpenMenuId(null);
+                                          }}
+                                          className="btn btn-sm text-start justify-content-between d-flex align-items-center gap-2 px-3 py-2"
+                                          style={{
+                                            color: "var(--red)",
+                                            border: "none",
+                                            background: "none",
+                                            fontSize: "13px",
+                                          }}
+                                        >
+                                          <span>Delete</span>
+                                          <FaTrash size={11} />
+                                        </button>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                           </div>
                         </div>
 
                         {editingCommentId === c._id ? (
                           <div className="mt-2">
-                            <textarea className="form-control mb-2" rows={2} autoFocus
-                              value={editText} onChange={(e) => setEditText(e.target.value)}
-                              style={{ fontSize: "13px", resize: "none" }} />
+                            <textarea
+                              className="form-control mb-2"
+                              rows={2}
+                              autoFocus
+                              value={editText}
+                              onChange={(e) => setEditText(e.target.value)}
+                              style={{ fontSize: "13px", resize: "none" }}
+                            />
                             <div className="d-flex gap-2">
-                              <button onClick={() => handleSaveEdit(c._id)}
+                              <button
+                                onClick={() => handleSaveEdit(c._id)}
                                 className="btn btn-sm fw-semibold d-flex align-items-center gap-1"
                                 disabled={editLoading}
-                                style={{ backgroundColor: "var(--green)", color: "white", fontSize: "12px" }}>
-                                {editLoading ? <span className="spinner-border spinner-border-sm" /> : <><FaCheck size={10} /> Save</>}
+                                style={{
+                                  backgroundColor: "var(--green)",
+                                  color: "white",
+                                  fontSize: "12px",
+                                }}
+                              >
+                                {editLoading ? (
+                                  <span className="spinner-border spinner-border-sm" />
+                                ) : (
+                                  <>
+                                    <FaCheck size={10} /> Save
+                                  </>
+                                )}
                               </button>
-                              <button onClick={handleCancelEdit}
+                              <button
+                                onClick={handleCancelEdit}
                                 className="btn btn-sm d-flex align-items-center gap-1"
-                                style={{ border: "1px solid var(--border)", color: "var(--gray)", fontSize: "12px" }}>
+                                style={{
+                                  border: "1px solid var(--border)",
+                                  color: "var(--gray)",
+                                  fontSize: "12px",
+                                }}
+                              >
                                 <FaTimes size={10} /> Cancel
                               </button>
                             </div>
                           </div>
                         ) : (
                           <div>
-                            <p className="mb-0 mt-1" style={{ fontSize: "14px", color: "var(--text)" }}>{c.text}</p>
+                            <p
+                              className="mb-0 mt-1"
+                              style={{ fontSize: "14px", color: "var(--text)" }}
+                            >
+                              {c.text}
+                            </p>
                             {c.editedAt && (
-                              <small style={{ color: "var(--gray)", fontSize: "11px", fontStyle: "italic" }}>edited</small>
+                              <small
+                                style={{
+                                  color: "var(--gray)",
+                                  fontSize: "11px",
+                                  fontStyle: "italic",
+                                }}
+                              >
+                                edited
+                              </small>
                             )}
                           </div>
                         )}
@@ -478,32 +724,82 @@ const SinglePost = () => {
             {/* RIGHT - SIDEBAR */}
             <div className="col-lg-4">
               {singlePost.tags?.length > 0 && (
-                <div className="p-3 rounded shadow-sm mb-4"
-                  style={{ backgroundColor: "white", border: "1px solid var(--border)" }}>
-                  <h6 className="fw-bold mb-3 pb-2" style={{ borderBottom: "2px solid var(--green)" }}>Tags</h6>
+                <div
+                  className="p-3 rounded shadow-sm mb-4"
+                  style={{
+                    backgroundColor: "white",
+                    border: "1px solid var(--border)",
+                  }}
+                >
+                  <h6
+                    className="fw-bold mb-3 pb-2"
+                    style={{ borderBottom: "2px solid var(--green)" }}
+                  >
+                    Tags
+                  </h6>
                   <div className="d-flex flex-wrap gap-2">
                     {singlePost.tags.map((tag, i) => (
-                      <span key={i} style={{
-                        backgroundColor: "var(--light-green)", color: "var(--green)",
-                        padding: "4px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: "600",
-                      }}>#{tag}</span>
+                      <span
+                        key={i}
+                        style={{
+                          backgroundColor: "var(--light-green)",
+                          color: "var(--green)",
+                          padding: "4px 12px",
+                          borderRadius: "20px",
+                          fontSize: "12px",
+                          fontWeight: "600",
+                        }}
+                      >
+                        #{tag}
+                      </span>
                     ))}
                   </div>
                 </div>
               )}
 
-              <div className="p-3 rounded shadow-sm"
-                style={{ backgroundColor: "white", border: "1px solid var(--border)" }}>
-                <h6 className="fw-bold mb-3 pb-2" style={{ borderBottom: "2px solid var(--green)" }}>Browse Categories</h6>
+              <div
+                className="p-3 rounded shadow-sm"
+                style={{
+                  backgroundColor: "white",
+                  border: "1px solid var(--border)",
+                }}
+              >
+                <h6
+                  className="fw-bold mb-3 pb-2"
+                  style={{ borderBottom: "2px solid var(--green)" }}
+                >
+                  Browse Categories
+                </h6>
                 <div className="d-flex flex-wrap gap-2">
-                  {["news", "gist", "gossip", "entertainment", "lifestyle", "sports"].map((cat) => (
-                    <Link key={cat} to={`/category/${cat}`} className="text-capitalize"
+                  {[
+                    "news",
+                    "gist",
+                    "gossip",
+                    "entertainment",
+                    "lifestyle",
+                    "sports",
+                  ].map((cat) => (
+                    <Link
+                      key={cat}
+                      to={`/category/${cat}`}
+                      className="text-capitalize"
                       style={{
-                        backgroundColor: singlePost.category === cat ? "var(--green)" : "var(--light-green)",
-                        color: singlePost.category === cat ? "white" : "var(--green)",
-                        padding: "5px 12px", borderRadius: "20px", fontSize: "13px",
-                        fontWeight: "600", textDecoration: "none", border: "1px solid var(--green)",
-                      }}>
+                        backgroundColor:
+                          singlePost.category === cat
+                            ? "var(--green)"
+                            : "var(--light-green)",
+                        color:
+                          singlePost.category === cat
+                            ? "white"
+                            : "var(--green)",
+                        padding: "5px 12px",
+                        borderRadius: "20px",
+                        fontSize: "13px",
+                        fontWeight: "600",
+                        textDecoration: "none",
+                        border: "1px solid var(--green)",
+                      }}
+                    >
                       {cat}
                     </Link>
                   ))}

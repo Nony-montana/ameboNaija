@@ -25,6 +25,7 @@ import AdminPosts from "./pages/dashboard/AdminPost";
 import AdminUsers from "./pages/dashboard/AdminUser";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import AdminComments from "./pages/dashboard/AdminComment";
+import AuthorProfile from "./pages/AuthorPage";
 // import { setUser, logout } from "./store/slices/authSlice";
 // import API from "./api/axios";
 
@@ -78,6 +79,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/author/:id" element={<AuthorProfile />} />
 
           {/* Dashboard Routes (protected) */}
           <Route path="/dashboard" element={<Dashboard />} />

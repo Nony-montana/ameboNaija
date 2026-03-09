@@ -49,7 +49,7 @@
 // What's Missing (to get to 9/10):
 // High Priority:
 
-// Email notifications — welcome email is done but you still need: post approved/rejected email to author, password reset confirmation ✅
+// Email notifications — welcome email is done but you still need: post approved/rejected email to author, password reset / change password confirmation ✅
 // Notification system — bell icon showing when your post gets approved, someone likes/comments on your post
 // Pagination on homepage — if posts grow you need infinite scroll or page numbers
 // 404 page — you reference /404 in the code but likely haven't built it ✅
