@@ -287,9 +287,6 @@ const SinglePost = () => {
                 <div className="d-flex align-items-center gap-2 my-3">
                   <FaUserCircle size={32} color="var(--green)" />
                   <div>
-                    {/* <p className="mb-0 fw-semibold" style={{ fontSize: "14px" }}>
-                      {singlePost.author?.firstName} {singlePost.author?.lastName}
-                    </p> */}
                     <Link
                       to={`/author/${singlePost.author?._id}`}
                       style={{ textDecoration: "none", color: "inherit" }}
