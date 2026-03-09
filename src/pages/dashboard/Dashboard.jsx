@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
-import { FaPen, FaList, FaClock, FaUserShield } from "react-icons/fa";
+import { FaPen, FaList, FaClock, FaUserShield, FaBookmark } from "react-icons/fa";
 import { CiSettings } from "react-icons/ci";
 
 const Dashboard = () => {
@@ -104,6 +104,42 @@ const Dashboard = () => {
                 </h6>
                 <p style={{ fontSize: "13px", color: "var(--gray)" }}>
                   View and manage all your published posts
+                </p>
+              </div>
+            </Link>
+          </div>
+
+          <div className="col-md-4">
+            <Link to="/dashboard/bookmarks" style={{ textDecoration: "none" }}>
+              <div
+                className="p-4 rounded shadow-sm h-100 bg-white d-flex flex-column align-items-center text-center"
+                style={{
+                  border: "2px solid var(--light-green)",
+                  transition: "all 0.2s ease",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.borderColor = "var(--green)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.borderColor = "var(--light-green)")
+                }
+              >
+                <div
+                  className="mb-3 d-flex align-items-center justify-content-center rounded-circle"
+                  style={{
+                    width: "60px",
+                    height: "60px",
+                    backgroundColor: "var(--light-green)",
+                  }}
+                >
+                  <FaBookmark size={24} color="var(--green)" />
+                </div>
+                <h6 className="fw-bold" style={{ color: "var(--text)" }}>
+                 My Bookmarks
+                </h6>
+                <p style={{ fontSize: "13px", color: "var(--gray)" }}>
+                  View all your saved posts
                 </p>
               </div>
             </Link>
