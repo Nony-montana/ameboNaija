@@ -23,7 +23,7 @@ const getReadingTime = (text) => {
   return `${minutes} min read`;
 };
 
-// ─── EXCERPT HELPER (for meta description) ────────────────────────
+// ─── EXCERPT HELPER ────────────────────────────────────────────────
 const getExcerpt = (text, length = 155) => {
   if (!text) return "";
   return text.length > length ? text.slice(0, length).trim() + "..." : text;
@@ -48,6 +48,9 @@ const SinglePost = () => {
   const [editText, setEditText] = useState("");
   const [editLoading, setEditLoading] = useState(false);
 
+  // ─── RELATED POSTS STATE ───────────────────────────────────────
+  const [relatedPosts, setRelatedPosts] = useState([]);
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -64,6 +67,24 @@ const SinglePost = () => {
     fetchPost();
     return () => dispatch(clearSinglePost());
   }, [slug]);
+
+  // ─── FETCH RELATED POSTS whenever singlePost changes ──────────
+  useEffect(() => {
+    const fetchRelated = async () => {
+      if (!singlePost?.category) return;
+      try {
+        const res = await API.get(`/posts?category=${singlePost.category}&limit=4`);
+        // Exclude the current post from related list
+        const filtered = res.data.data
+          .filter((p) => p.slug !== slug)
+          .slice(0, 3);
+        setRelatedPosts(filtered);
+      } catch {
+        setRelatedPosts([]);
+      }
+    };
+    fetchRelated();
+  }, [singlePost?.category, slug]);
 
   const formatDate = (date) =>
     new Date(date).toLocaleDateString("en-NG", {
@@ -150,7 +171,7 @@ const SinglePost = () => {
 
   if (loading || !singlePost) return <Spinner />;
 
-  // ─── SEO VALUES ────────────────────────────────────────────────────
+  // ─── SEO VALUES ────────────────────────────────────────────────
   const pageTitle = `${singlePost.title} | AmeboNaija`;
   const pageDescription = getExcerpt(singlePost.content);
   const pageImage = singlePost.image || "https://amebonaija.vercel.app/logo.png";
@@ -159,29 +180,22 @@ const SinglePost = () => {
 
   return (
     <>
-      {/* ─── SEO META TAGS ─────────────────────────────────────────── */}
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
         <link rel="canonical" href={pageUrl} />
-
-        {/* Open Graph — WhatsApp, Facebook, Twitter previews */}
         <meta property="og:type" content="article" />
         <meta property="og:title" content={singlePost.title} />
         <meta property="og:description" content={pageDescription} />
         <meta property="og:image" content={pageImage} />
         <meta property="og:url" content={pageUrl} />
         <meta property="og:site_name" content="AmeboNaija" />
-
-        {/* Article specific */}
         <meta property="article:published_time" content={singlePost.createdAt} />
         <meta property="article:author" content={`${singlePost.author?.firstName} ${singlePost.author?.lastName}`} />
         <meta property="article:section" content={singlePost.category} />
         {singlePost.tags?.map((tag, i) => (
           <meta key={i} property="article:tag" content={tag} />
         ))}
-
-        {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={singlePost.title} />
         <meta name="twitter:description" content={pageDescription} />
@@ -194,6 +208,7 @@ const SinglePost = () => {
             {/* LEFT - MAIN CONTENT */}
             <div className="col-lg-8">
               <div className="bg-white rounded shadow-sm p-4">
+
                 {/* CATEGORY, DATE & READING TIME */}
                 <div className="d-flex align-items-center gap-2 mb-3">
                   <Link
@@ -237,8 +252,7 @@ const SinglePost = () => {
                 {singlePost.image && (
                   <div className="mb-4" style={{ borderRadius: "8px", overflow: "hidden" }}>
                     <img
-                      src={singlePost.image}
-                      alt={singlePost.title}
+                      src={singlePost.image} alt={singlePost.title}
                       style={{ width: "100%", maxHeight: "450px", objectFit: "cover" }}
                     />
                   </div>
@@ -251,9 +265,7 @@ const SinglePost = () => {
                       <span key={i} style={{
                         backgroundColor: "var(--light-green)", color: "var(--green)",
                         padding: "3px 10px", borderRadius: "20px", fontSize: "12px", fontWeight: "600",
-                      }}>
-                        #{tag}
-                      </span>
+                      }}>#{tag}</span>
                     ))}
                   </div>
                 )}
@@ -291,6 +303,70 @@ const SinglePost = () => {
                 {message && (
                   <div className="mt-3">
                     <MessageToast message={message} messageType={messageType} />
+                  </div>
+                )}
+
+                {/* ─── RELATED POSTS ─────────────────────────────────────── */}
+                {relatedPosts.length > 0 && (
+                  <div className="mt-4 pt-3" style={{ borderTop: "1px solid var(--border)" }}>
+                    <h6 className="fw-bold mb-3" style={{ color: "var(--text)" }}>
+                      More{" "}
+                      <span className="text-capitalize" style={{ color: "var(--green)" }}>
+                        {singlePost.category}
+                      </span>{" "}
+                      Gist
+                    </h6>
+                    <div className="row g-3">
+                      {relatedPosts.map((post) => (
+                        <div className="col-12" key={post._id}>
+                          <Link
+                            to={`/post/${post.slug}`}
+                            style={{ textDecoration: "none" }}
+                          >
+                            <div
+                              className="d-flex gap-3 p-2 rounded"
+                              style={{
+                                border: "1px solid var(--border)",
+                                transition: "background 0.2s",
+                                backgroundColor: "white",
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--light-green)"}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "white"}
+                            >
+                              {/* THUMBNAIL */}
+                              {post.image && (
+                                <img
+                                  src={post.image}
+                                  alt={post.title}
+                                  style={{
+                                    width: "90px", height: "70px",
+                                    objectFit: "cover", borderRadius: "6px",
+                                    flexShrink: 0,
+                                  }}
+                                />
+                              )}
+                              {/* TEXT */}
+                              <div className="d-flex flex-column justify-content-center">
+                                <p className="mb-1 fw-semibold" style={{
+                                  fontSize: "13px", color: "var(--text)",
+                                  lineHeight: "1.4",
+                                  display: "-webkit-box",
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: "vertical",
+                                  overflow: "hidden",
+                                }}>
+                                  {post.title}
+                                </p>
+                                <small style={{ color: "var(--gray)", fontSize: "11px" }}>
+                                  <FaClock size={9} /> {formatDate(post.createdAt)}
+                                  {" · "}{getReadingTime(post.content)}
+                                </small>
+                              </div>
+                            </div>
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 
