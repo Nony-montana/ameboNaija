@@ -16,15 +16,16 @@ const Home = () => {
   const dispatch = useDispatch();
   const { posts, trendingPosts, loading, error, totalPages, currentPage } =
     useSelector((state) => state.posts);
+  const { isLoggedIn } = useSelector((state) => state.auth);
 
-  // Keep featured post fixed to page 1's first post
   const [featuredPost, setFeaturedPost] = useState(null);
+  const [savedIds, setSavedIds] = useState([]);
 
   // Fetch all posts
   const fetchPosts = async (page = 1) => {
     dispatch(setLoading());
     try {
-      const res = await API.get(`/posts?page=${page}`);
+      const res = await API.get(`/posts?page=${page}&limit=12`);
       dispatch(
         setAllPosts({
           data: res.data.data,
@@ -32,7 +33,6 @@ const Home = () => {
           page: res.data.page,
         }),
       );
-      // Only set featured post on first page load
       if (page === 1 && res.data.data.length > 0) {
         setFeaturedPost(res.data.data[0]);
       }
@@ -50,10 +50,22 @@ const Home = () => {
     }
   };
 
+  // Fetch user's bookmarks to show saved state on PostCards
+  const fetchBookmarks = async () => {
+    if (!isLoggedIn) return;
+    try {
+      const res = await API.get("/bookmarks");
+      setSavedIds(res.data.data.map((p) => p._id));
+    } catch {
+      setSavedIds([]);
+    }
+  };
+
   useEffect(() => {
     fetchPosts();
     fetchTrending();
-  }, []);
+    fetchBookmarks();
+  }, [isLoggedIn]);
 
   // Scroll to top + fetch page
   const handlePageChange = (page) => {
@@ -63,13 +75,9 @@ const Home = () => {
   };
 
   const safePosts = Array.isArray(posts) ? posts : [];
-
-  // On page 1 skip featured post from the grid, on other pages show all
   const gridPosts = currentPage === 1 ? safePosts.slice(1) : safePosts;
-
   const safeTrending = Array.isArray(trendingPosts) ? trendingPosts : [];
 
-  // Build page numbers with ellipsis
   const getPageNumbers = () => {
     if (totalPages <= 5) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -190,7 +198,7 @@ const Home = () => {
               <div className="row g-3">
                 {gridPosts.map((post) => (
                   <div className="col-md-6" key={post._id}>
-                   <PostCard post={post} savedIds={savedIds} />
+                    <PostCard post={post} savedIds={savedIds} />
                   </div>
                 ))}
               </div>
@@ -198,8 +206,6 @@ const Home = () => {
               {/* PAGINATION */}
               {totalPages > 1 && (
                 <div className="d-flex justify-content-center align-items-center gap-2 mt-4 flex-wrap">
-
-                  {/* PREV BUTTON */}
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
@@ -208,19 +214,15 @@ const Home = () => {
                       border: "1px solid var(--green)",
                       color: currentPage === 1 ? "var(--gray)" : "var(--green)",
                       borderColor: currentPage === 1 ? "var(--border)" : "var(--green)",
-                      backgroundColor: "white",
-                      fontSize: "13px",
+                      backgroundColor: "white", fontSize: "13px",
                     }}
                   >
                     <FaChevronLeft size={11} /> Prev
                   </button>
 
-                  {/* PAGE NUMBERS */}
                   {getPageNumbers().map((page, i) =>
                     page === "..." ? (
-                      <span key={`ellipsis-${i}`} style={{ color: "var(--gray)", fontSize: "14px" }}>
-                        ...
-                      </span>
+                      <span key={`ellipsis-${i}`} style={{ color: "var(--gray)", fontSize: "14px" }}>...</span>
                     ) : (
                       <button
                         key={page}
@@ -239,7 +241,6 @@ const Home = () => {
                     )
                   )}
 
-                  {/* NEXT BUTTON */}
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
@@ -248,8 +249,7 @@ const Home = () => {
                       border: "1px solid var(--green)",
                       color: currentPage === totalPages ? "var(--gray)" : "var(--green)",
                       borderColor: currentPage === totalPages ? "var(--border)" : "var(--green)",
-                      backgroundColor: "white",
-                      fontSize: "13px",
+                      backgroundColor: "white", fontSize: "13px",
                     }}
                   >
                     Next <FaChevronRight size={11} />
@@ -260,7 +260,6 @@ const Home = () => {
 
             {/* RIGHT - SIDEBAR */}
             <div className="col-lg-4">
-              {/* TRENDING */}
               <div
                 className="p-3 rounded shadow-sm mb-4"
                 style={{ backgroundColor: "white", border: "1px solid var(--border)" }}
@@ -303,7 +302,6 @@ const Home = () => {
                 ))}
               </div>
 
-              {/* CATEGORIES WIDGET */}
               <div
                 className="p-3 rounded shadow-sm"
                 style={{ backgroundColor: "white", border: "1px solid var(--border)" }}
