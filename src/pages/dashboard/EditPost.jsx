@@ -18,8 +18,6 @@ const EditPost = () => {
     const [messageType, setMessageType] = useState("");
     const [imagePreview, setImagePreview] = useState(null);
 
-
-    // Redirect if not logged in
     useEffect(() => {
         if (!isLoggedIn) navigate("/login");
     }, [isLoggedIn]);
@@ -52,8 +50,6 @@ const EditPost = () => {
 
                 if (values.tags) {
                     const tagsArray = values.tags.split(",").map((t) => t.trim()).filter(Boolean);
-                    // FIX: Send tags as a JSON string instead of repeated keys,
-                    // so the backend can reliably parse it as an array regardless of multer config.
                     formData.append("tags", JSON.stringify(tagsArray));
                 }
 
@@ -61,9 +57,6 @@ const EditPost = () => {
                     formData.append("image", values.image);
                 }
 
-                // FIX: Let the browser set the Content-Type boundary automatically
-                // by NOT manually setting "Content-Type": "multipart/form-data".
-                // Manually setting it omits the boundary and breaks file uploads.
                 await API.put(`/posts/${slug}`, formData);
 
                 setMessage("Post updated! It will be reviewed by admin before publishing");
@@ -79,27 +72,22 @@ const EditPost = () => {
         },
     });
 
-    // Fetch existing post data and populate form
+    // Fetch existing post data using preview route (works for drafts/pending too)
     useEffect(() => {
         const fetchPost = async () => {
             try {
-                const res = await API.get(`/posts/${slug}`);
+                const res = await API.get(`/posts/preview/${slug}`);
                 const post = res.data.data;
 
-                // Fill the form with existing post data
                 formik.setValues({
                     title: post.title || "",
                     content: post.content || "",
                     category: post.category || "",
                     tags: post.tags?.join(", ") || "",
-                    // FIX: If a post was previously approved/published and is being
-                    // re-edited, reset to "draft" so the user consciously re-submits.
-                    // For posts already in draft or pending, preserve their status.
                     status: post.status === "published" ? "draft" : (post.status || "draft"),
                     image: null,
                 });
 
-                // Show existing image as preview
                 if (post.image) setImagePreview(post.image);
 
             } catch (err) {
@@ -120,8 +108,6 @@ const EditPost = () => {
         }
     };
 
-    // FIX: Clean up object URLs to avoid memory leaks when component unmounts
-    // or when a new image is selected.
     useEffect(() => {
         return () => {
             if (imagePreview && imagePreview.startsWith("blob:")) {
@@ -252,17 +238,14 @@ const EditPost = () => {
                                 </span>
                             </label>
 
-                            {/* IMAGE PREVIEW */}
                             {imagePreview && (
                                 <div className="mb-2">
                                     <img
                                         src={imagePreview}
                                         alt="preview"
                                         style={{
-                                            width: "100%",
-                                            maxHeight: "250px",
-                                            objectFit: "cover",
-                                            borderRadius: "8px",
+                                            width: "100%", maxHeight: "250px",
+                                            objectFit: "cover", borderRadius: "8px",
                                             border: "1px solid var(--border)"
                                         }}
                                     />
@@ -272,10 +255,8 @@ const EditPost = () => {
                             <div
                                 className="d-flex align-items-center justify-content-center rounded"
                                 style={{
-                                    border: "2px dashed var(--border)",
-                                    padding: "20px",
-                                    cursor: "pointer",
-                                    backgroundColor: "var(--light-green)"
+                                    border: "2px dashed var(--border)", padding: "20px",
+                                    cursor: "pointer", backgroundColor: "var(--light-green)"
                                 }}
                                 onClick={() => document.getElementById("editImageInput").click()}
                             >
@@ -324,27 +305,16 @@ const EditPost = () => {
                                 type="submit"
                                 className="btn fw-bold px-4"
                                 disabled={loading}
-                                style={{
-                                    backgroundColor: "var(--green)",
-                                    color: "white",
-                                    fontSize: "14px"
-                                }}
+                                style={{ backgroundColor: "var(--green)", color: "white", fontSize: "14px" }}
                             >
                                 {loading ? (
-                                    <>
-                                        <span className="spinner-border spinner-border-sm me-2" />
-                                        Saving...
-                                    </>
+                                    <><span className="spinner-border spinner-border-sm me-2" />Saving...</>
                                 ) : "Save Changes"}
                             </button>
                             <Link
                                 to="/dashboard/my-posts"
                                 className="btn fw-semibold px-4"
-                                style={{
-                                    border: "1px solid var(--border)",
-                                    color: "var(--gray)",
-                                    fontSize: "14px"
-                                }}
+                                style={{ border: "1px solid var(--border)", color: "var(--gray)", fontSize: "14px" }}
                             >
                                 Cancel
                             </Link>
