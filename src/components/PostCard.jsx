@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { FaEye, FaHeart, FaClock, FaBookmark, FaRegBookmark } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import API from "../api/axios";
 
@@ -9,6 +9,11 @@ const PostCard = ({ post, savedIds = [] }) => {
     const [bookmarked, setBookmarked] = useState(savedIds.includes(post._id));
     const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
+    // Sync bookmark state when savedIds loads async
+    useEffect(() => {
+        setBookmarked(savedIds.includes(post._id));
+    }, [savedIds, post._id]);
+
     const formatDate = (date) => {
         return new Date(date).toLocaleDateString("en-NG", {
             day: "numeric", month: "short", year: "numeric",
@@ -16,7 +21,7 @@ const PostCard = ({ post, savedIds = [] }) => {
     };
 
     const handleBookmark = async (e) => {
-        e.preventDefault(); // prevent navigating to post
+        e.preventDefault();
         if (!isLoggedIn) return;
         setBookmarkLoading(true);
         try {

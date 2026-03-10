@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import API from "../api/axios";
 import PostCard from "../components/PostCard";
 import Spinner from "../components/Spinner";
@@ -13,7 +14,9 @@ const Search = () => {
     const [searched, setSearched] = useState(false);
     const [searchInput, setSearchInput] = useState(q);
 
-    // Fetch search results
+    const { isLoggedIn } = useSelector((state) => state.auth);
+    const [savedIds, setSavedIds] = useState([]);
+
     const fetchResults = async (query) => {
         if (!query.trim()) return;
         setLoading(true);
@@ -28,13 +31,23 @@ const Search = () => {
         }
     };
 
-    // Fetch on page load if q exists in URL
+    const fetchBookmarks = async () => {
+        if (!isLoggedIn) return;
+        try {
+            const res = await API.get("/bookmarks");
+            setSavedIds(res.data.data.map((p) => p._id));
+        } catch {
+            setSavedIds([]);
+        }
+    };
+
     useEffect(() => {
         if (q) {
             setSearchInput(q);
             fetchResults(q);
         }
-    }, [q]);
+        fetchBookmarks();
+    }, [q, isLoggedIn]);
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -49,7 +62,6 @@ const Search = () => {
             {/* SEARCH HERO */}
             <div style={{ backgroundColor: "var(--green)", color: "white" }}>
                 <div className="container py-4">
-                    {/* BREADCRUMB */}
                     <div className="d-flex align-items-center gap-2 mb-3" style={{ fontSize: "13px" }}>
                         <Link to="/" style={{ color: "#ccffcc", textDecoration: "none" }}>
                             <FaHome size={12} /> Home
@@ -60,7 +72,6 @@ const Search = () => {
 
                     <h4 className="fw-bold mb-3">Search Amebo Naija 🔍</h4>
 
-                    {/* SEARCH FORM */}
                     <form onSubmit={handleSearch} style={{ maxWidth: "550px" }}>
                         <div className="input-group">
                             <input
@@ -86,7 +97,6 @@ const Search = () => {
             <div className="container py-4">
                 {loading && <Spinner />}
 
-                {/* NOT SEARCHED YET */}
                 {!searched && !loading && (
                     <div className="text-center py-5">
                         <p style={{ fontSize: "50px" }}>🔍</p>
@@ -97,7 +107,6 @@ const Search = () => {
                     </div>
                 )}
 
-                {/* NO RESULTS */}
                 {searched && !loading && results.length === 0 && (
                     <div className="text-center py-5 bg-white rounded shadow-sm">
                         <p style={{ fontSize: "40px" }}>😅</p>
@@ -115,10 +124,8 @@ const Search = () => {
                     </div>
                 )}
 
-                {/* RESULTS */}
                 {searched && !loading && results.length > 0 && (
                     <>
-                        {/* RESULTS COUNT */}
                         <p style={{ fontSize: "13px", color: "var(--gray)" }} className="mb-3">
                             Found <strong>{results.length}</strong> results for{" "}
                             <span className="fw-semibold" style={{ color: "var(--green)" }}>
@@ -126,11 +133,10 @@ const Search = () => {
                             </span>
                         </p>
 
-                        {/* RESULTS GRID */}
                         <div className="row g-4">
                             {results.map((post) => (
                                 <div className="col-md-6 col-lg-4" key={post._id}>
-                                   <PostCard post={post} savedIds={savedIds} />
+                                    <PostCard post={post} savedIds={savedIds} />
                                 </div>
                             ))}
                         </div>

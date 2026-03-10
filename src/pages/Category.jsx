@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import API from "../api/axios";
@@ -13,6 +13,8 @@ const Category = () => {
     const { posts, loading, error, totalPages, currentPage } = useSelector(
         (state) => state.posts
     );
+    const { isLoggedIn } = useSelector((state) => state.auth);
+    const [savedIds, setSavedIds] = useState([]);
 
     const fetchByCategory = async (page = 1) => {
         dispatch(setLoading());
@@ -28,11 +30,21 @@ const Category = () => {
         }
     };
 
-    // Refetch when category changes
+    const fetchBookmarks = async () => {
+        if (!isLoggedIn) return;
+        try {
+            const res = await API.get("/bookmarks");
+            setSavedIds(res.data.data.map((p) => p._id));
+        } catch {
+            setSavedIds([]);
+        }
+    };
+
     useEffect(() => {
         fetchByCategory();
+        fetchBookmarks();
         window.scrollTo(0, 0);
-    }, [name]);
+    }, [name, isLoggedIn]);
 
     return (
         <div style={{ backgroundColor: "var(--bg)", minHeight: "100vh" }}>
@@ -40,7 +52,6 @@ const Category = () => {
             {/* CATEGORY HERO BANNER */}
             <div style={{ backgroundColor: "var(--green)", color: "white" }}>
                 <div className="container py-4">
-                    {/* BREADCRUMB */}
                     <div className="d-flex align-items-center gap-2 mb-2" style={{ fontSize: "13px" }}>
                         <Link to="/" style={{ color: "#ccffcc", textDecoration: "none" }}>
                             <FaHome size={12} /> Home
@@ -48,9 +59,7 @@ const Category = () => {
                         <span style={{ color: "#ccffcc" }}>›</span>
                         <span className="text-capitalize" style={{ color: "var(--gold)" }}>{name}</span>
                     </div>
-                    <h4 className="fw-bold mb-1 text-capitalize">
-                        {name} 🇳🇬
-                    </h4>
+                    <h4 className="fw-bold mb-1 text-capitalize">{name} 🇳🇬</h4>
                     <p style={{ fontSize: "14px", color: "#ccffcc", marginBottom: 0 }}>
                         Latest {name} stories from Amebo Naija
                     </p>
@@ -85,7 +94,6 @@ const Category = () => {
 
                 {!loading && !error && posts.length > 0 && (
                     <>
-                        {/* RESULTS COUNT */}
                         <p style={{ fontSize: "13px", color: "var(--gray)" }} className="mb-3">
                             Showing <strong>{posts.length}</strong> stories in{" "}
                             <span className="text-capitalize fw-semibold" style={{ color: "var(--green)" }}>
@@ -93,16 +101,14 @@ const Category = () => {
                             </span>
                         </p>
 
-                        {/* POSTS GRID */}
                         <div className="row g-4">
                             {posts.map((post) => (
                                 <div className="col-md-6 col-lg-4" key={post._id}>
-                                   <PostCard post={post} savedIds={savedIds} />
+                                    <PostCard post={post} savedIds={savedIds} />
                                 </div>
                             ))}
                         </div>
 
-                        {/* PAGINATION */}
                         {totalPages > 1 && (
                             <div className="d-flex justify-content-center gap-2 mt-4">
                                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
