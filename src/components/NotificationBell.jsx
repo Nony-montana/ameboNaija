@@ -56,6 +56,24 @@ const NotificationBell = () => {
     }
   };
 
+  const formattedTime =(createdAt)=>{
+    const today = new Date()
+    const pastDay = new Date(createdAt) 
+
+    const seconds = Math.floor((today-pastDay)/1000)
+
+    if(seconds<60) return "Just now"
+
+    const minutes = Math.floor(seconds/60);
+    if(minutes<60) return `${minutes} min(s) ago`;
+
+    const hours = Math.floor(minutes/60);
+    if(hours<24) return `${hours} hr(s) ago`;
+
+    const days = Math.floor(hours/24)
+    return  `${days} day(s) ago`
+  }
+
   return (
     <div ref={ref} style={{ position: "relative" }}>
       {/* BELL ICON */}
@@ -148,7 +166,7 @@ const NotificationBell = () => {
                   )}
                   <br />
                   <small style={{ color: "var(--gray)", fontSize: "11px" }}>
-                    {new Date(n.createdAt).toLocaleString("en-NG")}
+                    {formattedTime(n.createdAt).toLocaleString("en-NG")}
                   </small>
                 </div>
               ))
