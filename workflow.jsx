@@ -68,5 +68,5 @@
 // 12. Search page — dedicated search results page ✅
 // 13. Dark mode — you have CSS variables set up already, halfway there
 // 14. Rate limiting on backend — prevent spam/abuse
-//share
-//user profile
+//share ✅
+//user profile ✅

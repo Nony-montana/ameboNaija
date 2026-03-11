@@ -4,22 +4,35 @@ import { useNavigate, Link } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import {
-  FaCog, FaLock, FaTrashAlt, FaUser, FaPaperPlane,
-  FaEye, FaEyeSlash, FaUserCircle, FaEnvelope,
-  FaCalendarAlt, FaShieldAlt, FaNewspaper,
+  FaCog,
+  FaLock,
+  FaTrashAlt,
+  FaUser,
+  FaPaperPlane,
+  FaEye,
+  FaEyeSlash,
+  FaUserCircle,
+  FaEnvelope,
+  FaCalendarAlt,
+  FaShieldAlt,
+  FaNewspaper,
+  FaPen,
 } from "react-icons/fa";
 import API from "../../api/axios";
 import MessageToast from "../../components/ui/MessageToast";
 import { FiAlertTriangle } from "react-icons/fi";
 import { logout, updateUser } from "../../store/slices/authSlice";
 import PasswordField from "../../components/ui/PasswordField";
+import { BiStar, BiUserCheck } from "react-icons/bi";
 
 const Settings = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
 
-  const [activeTab, setActiveTab] = useState("profile");
+  console.log(user);
+  
+  const [activeTab, setActiveTab] = useState("myprofile");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [loadingProfile, setLoadingProfile] = useState(false);
@@ -32,9 +45,16 @@ const Settings = () => {
   const [otpLoading, setOtpLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [loadingPassword, setLoadingPassword] = useState(false);
-  const [showPasswords, setShowPasswords] = useState({ current: false, new: false, confirm: false });
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
   const [passwordForm, setPasswordForm] = useState({
-    otp: "", currentPassword: "", newPassword: "", confirmNewPassword: "",
+    otp: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
   });
 
   // Fetch post count for profile tab
@@ -60,7 +80,10 @@ const Settings = () => {
     setCountdown(60);
     const interval = setInterval(() => {
       setCountdown((prev) => {
-        if (prev <= 1) { clearInterval(interval); return 0; }
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
         return prev - 1;
       });
     }, 1000);
@@ -81,27 +104,43 @@ const Settings = () => {
   };
 
   const handlePasswordSubmit = async () => {
-    const { otp, currentPassword, newPassword, confirmNewPassword } = passwordForm;
+    const { otp, currentPassword, newPassword, confirmNewPassword } =
+      passwordForm;
     if (!otp || !currentPassword || !newPassword || !confirmNewPassword) {
-      showMessage("All fields are required", "error"); return;
+      showMessage("All fields are required", "error");
+      return;
     }
     if (newPassword !== confirmNewPassword) {
-      showMessage("New passwords do not match", "error"); return;
+      showMessage("New passwords do not match", "error");
+      return;
     }
     if (newPassword.length < 6) {
-      showMessage("New password must be at least 6 characters", "error"); return;
+      showMessage("New password must be at least 6 characters", "error");
+      return;
     }
     if (currentPassword === newPassword) {
-      showMessage("New password must be different from current password", "error"); return;
+      showMessage(
+        "New password must be different from current password",
+        "error",
+      );
+      return;
     }
     setLoadingPassword(true);
     try {
       const res = await API.post("/auth/change-password-otp", passwordForm);
       showMessage(res.data.message, "success");
-      setPasswordForm({ otp: "", currentPassword: "", newPassword: "", confirmNewPassword: "" });
+      setPasswordForm({
+        otp: "",
+        currentPassword: "",
+        newPassword: "",
+        confirmNewPassword: "",
+      });
       setOtpSent(false);
     } catch (err) {
-      showMessage(err.response?.data?.message || "Failed to change password", "error");
+      showMessage(
+        err.response?.data?.message || "Failed to change password",
+        "error",
+      );
     } finally {
       setLoadingPassword(false);
     }
@@ -116,7 +155,10 @@ const Settings = () => {
     validationSchema: yup.object({
       firstName: yup.string().required("First name is required"),
       lastName: yup.string().required("Last name is required"),
-      email: yup.string().email("Enter a valid email").required("Email is required"),
+      email: yup
+        .string()
+        .email("Enter a valid email")
+        .required("Email is required"),
     }),
     onSubmit: async (values) => {
       setLoadingProfile(true);
@@ -125,7 +167,10 @@ const Settings = () => {
         dispatch(updateUser(res.data.data));
         showMessage(res.data.message, "success");
       } catch (err) {
-        showMessage(err.response?.data?.message || "Failed to update profile", "error");
+        showMessage(
+          err.response?.data?.message || "Failed to update profile",
+          "error",
+        );
       } finally {
         setLoadingProfile(false);
       }
@@ -144,7 +189,10 @@ const Settings = () => {
         dispatch(logout());
         navigate("/");
       } catch (err) {
-        showMessage(err.response?.data?.message || "Failed to delete account", "error");
+        showMessage(
+          err.response?.data?.message || "Failed to delete account",
+          "error",
+        );
         setLoadingDelete(false);
       }
     },
@@ -155,12 +203,18 @@ const Settings = () => {
       className="btn w-100 text-start mb-1 d-flex align-items-center gap-2"
       style={{
         fontSize: "14px",
-        backgroundColor: activeTab === tab
-          ? danger ? "#fff0f0" : "var(--light-green)"
-          : "transparent",
-        color: activeTab === tab
-          ? danger ? "#dc2626" : "var(--green)"
-          : "var(--gray)",
+        backgroundColor:
+          activeTab === tab
+            ? danger
+              ? "#fff0f0"
+              : "var(--light-green)"
+            : "transparent",
+        color:
+          activeTab === tab
+            ? danger
+              ? "#dc2626"
+              : "var(--green)"
+            : "var(--gray)",
         fontWeight: activeTab === tab ? "600" : "400",
       }}
       onClick={() => setActiveTab(tab)}
@@ -170,30 +224,42 @@ const Settings = () => {
   );
 
   const inputStyle = {
-    fontSize: "14px", border: "1px solid var(--border)",
-    borderRadius: "8px", padding: "10px 14px", width: "100%", outline: "none",
+    fontSize: "14px",
+    border: "1px solid var(--border)",
+    borderRadius: "8px",
+    padding: "10px 14px",
+    width: "100%",
+    outline: "none",
   };
 
   const labelStyle = {
-    fontSize: "13px", fontWeight: "600", color: "var(--text)",
-    marginBottom: "6px", display: "block",
+    fontSize: "13px",
+    fontWeight: "600",
+    color: "var(--text)",
+    marginBottom: "6px",
+    display: "block",
   };
 
   const memberSince = user?.createdAt
-    ? new Date(user.createdAt).toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" })
+    ? new Date(user.createdAt).toLocaleDateString("en-NG", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
     : "N/A";
 
   return (
     <div style={{ backgroundColor: "var(--bg)", minHeight: "100vh" }}>
       <div className="container py-5">
-
         {/* HEADER */}
         <div className="d-flex align-items-center justify-content-between mb-4">
           <div>
             <h4 className="fw-bold mb-0 d-flex align-items-center gap-2">
               <FaCog color="var(--green)" /> Settings
             </h4>
-            <p style={{ color: "var(--gray)", fontSize: "14px" }}>Manage your account</p>
+            <p style={{ color: "var(--gray)", fontSize: "14px" }}>
+              Manage your account
+            </p>
           </div>
           <Link
             to="/dashboard"
@@ -214,49 +280,76 @@ const Settings = () => {
           {/* SIDEBAR TABS */}
           <div className="col-md-3">
             <div className="bg-white rounded shadow-sm p-2">
-              {tabBtn("myprofile", "My Profile",      <FaUserCircle size={13} />)}
-              {tabBtn("profile",   "Edit Profile",    <FaUser size={13} />)}
-              {tabBtn("password",  "Change Password", <FaLock size={13} />)}
-              {tabBtn("delete",    "Delete Account",  <FaTrashAlt size={13} />, true)}
+              {tabBtn("myprofile", "My Profile", <FaUserCircle size={13} />)}
+              {tabBtn("profile", "Edit Profile", <FaUser size={13} />)}
+              {tabBtn("password", "Change Password", <FaLock size={13} />)}
+              {tabBtn(
+                "delete",
+                "Delete Account",
+                <FaTrashAlt size={13} />,
+                true,
+              )}
             </div>
           </div>
 
           {/* CONTENT */}
           <div className="col-md-9">
             <div className="bg-white rounded shadow-sm p-4">
-
               {/* ── MY PROFILE ── */}
               {activeTab === "myprofile" && (
                 <>
                   <h6 className="fw-bold mb-1">My Profile</h6>
-                  <p style={{ color: "var(--gray)", fontSize: "13px" }} className="mb-4">
+                  <p
+                    style={{ color: "var(--gray)", fontSize: "13px" }}
+                    className="mb-4"
+                  >
                     Your account overview and details.
                   </p>
 
                   {/* PROFILE CARD */}
                   <div
                     className="p-4 rounded mb-4 text-center"
-                    style={{ background: "linear-gradient(135deg, var(--green), #2d8a4e)", color: "white" }}
+                    style={{
+                      background:
+                        "linear-gradient(135deg, var(--green), #2d8a4e)",
+                      color: "white",
+                    }}
                   >
                     <div
                       className="d-flex align-items-center justify-content-center mx-auto mb-3"
                       style={{
-                        width: "80px", height: "80px", borderRadius: "50%",
+                        width: "80px",
+                        height: "80px",
+                        borderRadius: "50%",
                         backgroundColor: "rgba(255,255,255,0.2)",
-                        fontSize: "32px", fontWeight: "700",
+                        fontSize: "32px",
+                        fontWeight: "700",
                       }}
                     >
-                      {user?.firstName?.[0]}{user?.lastName?.[0]}
+                      {user?.firstName?.[0]}
+                      {user?.lastName?.[0]}
                     </div>
-                    <h5 className="fw-bold mb-1">{user?.firstName} {user?.lastName}</h5>
+                    <h5 className="fw-bold mb-1">
+                      {user?.firstName} {user?.lastName}
+                    </h5>
                     <span
                       className="text-capitalize fw-semibold"
                       style={{
                         backgroundColor: "rgba(255,255,255,0.2)",
-                        padding: "3px 12px", borderRadius: "20px", fontSize: "12px",
+                        padding: "3px 12px",
+                        borderRadius: "20px",
+                        fontSize: "12px",
                       }}
                     >
-                      {user?.roles === "admin" ? "⭐ Admin" : "✍️ Writer"}
+                      {user?.roles === "admin" ? (
+                        <div>
+                          <BiStar size={12} color="gold" /> Admin
+                        </div>
+                      ) : (
+                        <div>
+                          <BiUserCheck size={12} /> User
+                        </div>
+                      )}
                     </span>
                   </div>
 
@@ -264,20 +357,39 @@ const Settings = () => {
                   <div className="d-flex flex-column gap-3">
                     <div
                       className="d-flex align-items-center gap-3 p-3 rounded"
-                      style={{ border: "1px solid var(--border)", backgroundColor: "var(--bg)" }}
+                      style={{
+                        border: "1px solid var(--border)",
+                        backgroundColor: "var(--bg)",
+                      }}
                     >
                       <div
                         style={{
-                          width: "38px", height: "38px", borderRadius: "50%",
+                          width: "38px",
+                          height: "38px",
+                          borderRadius: "50%",
                           backgroundColor: "var(--light-green)",
-                          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
                         }}
                       >
                         <FaUser size={14} color="var(--green)" />
                       </div>
                       <div>
-                        <small style={{ color: "var(--gray)", fontSize: "11px", fontWeight: "600" }}>FULL NAME</small>
-                        <p className="mb-0 fw-semibold" style={{ fontSize: "14px" }}>
+                        <small
+                          style={{
+                            color: "var(--gray)",
+                            fontSize: "11px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          FULL NAME
+                        </small>
+                        <p
+                          className="mb-0 fw-semibold"
+                          style={{ fontSize: "14px" }}
+                        >
                           {user?.firstName} {user?.lastName}
                         </p>
                       </div>
@@ -285,77 +397,161 @@ const Settings = () => {
 
                     <div
                       className="d-flex align-items-center gap-3 p-3 rounded"
-                      style={{ border: "1px solid var(--border)", backgroundColor: "var(--bg)" }}
+                      style={{
+                        border: "1px solid var(--border)",
+                        backgroundColor: "var(--bg)",
+                      }}
                     >
                       <div
                         style={{
-                          width: "38px", height: "38px", borderRadius: "50%",
+                          width: "38px",
+                          height: "38px",
+                          borderRadius: "50%",
                           backgroundColor: "var(--light-green)",
-                          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
                         }}
                       >
                         <FaEnvelope size={14} color="var(--green)" />
                       </div>
                       <div>
-                        <small style={{ color: "var(--gray)", fontSize: "11px", fontWeight: "600" }}>EMAIL ADDRESS</small>
-                        <p className="mb-0 fw-semibold" style={{ fontSize: "14px" }}>{user?.email}</p>
+                        <small
+                          style={{
+                            color: "var(--gray)",
+                            fontSize: "11px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          EMAIL ADDRESS
+                        </small>
+                        <p
+                          className="mb-0 fw-semibold"
+                          style={{ fontSize: "14px" }}
+                        >
+                          {user?.email}
+                        </p>
                       </div>
                     </div>
 
                     <div
                       className="d-flex align-items-center gap-3 p-3 rounded"
-                      style={{ border: "1px solid var(--border)", backgroundColor: "var(--bg)" }}
+                      style={{
+                        border: "1px solid var(--border)",
+                        backgroundColor: "var(--bg)",
+                      }}
                     >
                       <div
                         style={{
-                          width: "38px", height: "38px", borderRadius: "50%",
+                          width: "38px",
+                          height: "38px",
+                          borderRadius: "50%",
                           backgroundColor: "var(--light-green)",
-                          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
                         }}
                       >
                         <FaShieldAlt size={14} color="var(--green)" />
                       </div>
                       <div>
-                        <small style={{ color: "var(--gray)", fontSize: "11px", fontWeight: "600" }}>ROLE</small>
-                        <p className="mb-0 fw-semibold text-capitalize" style={{ fontSize: "14px" }}>{user?.roles}</p>
+                        <small
+                          style={{
+                            color: "var(--gray)",
+                            fontSize: "11px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          ROLE
+                        </small>
+                        <p
+                          className="mb-0 fw-semibold text-capitalize"
+                          style={{ fontSize: "14px" }}
+                        >
+                          {user?.roles}
+                        </p>
                       </div>
                     </div>
 
                     <div
                       className="d-flex align-items-center gap-3 p-3 rounded"
-                      style={{ border: "1px solid var(--border)", backgroundColor: "var(--bg)" }}
+                      style={{
+                        border: "1px solid var(--border)",
+                        backgroundColor: "var(--bg)",
+                      }}
                     >
                       <div
                         style={{
-                          width: "38px", height: "38px", borderRadius: "50%",
+                          width: "38px",
+                          height: "38px",
+                          borderRadius: "50%",
                           backgroundColor: "var(--light-green)",
-                          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
                         }}
                       >
                         <FaCalendarAlt size={14} color="var(--green)" />
                       </div>
                       <div>
-                        <small style={{ color: "var(--gray)", fontSize: "11px", fontWeight: "600" }}>MEMBER SINCE</small>
-                        <p className="mb-0 fw-semibold" style={{ fontSize: "14px" }}>{memberSince}</p>
+                        <small
+                          style={{
+                            color: "var(--gray)",
+                            fontSize: "11px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          MEMBER SINCE
+                        </small>
+                        <p
+                          className="mb-0 fw-semibold"
+                          style={{ fontSize: "14px" }}
+                        >
+                          {memberSince}
+                        </p>
                       </div>
                     </div>
 
                     <div
                       className="d-flex align-items-center gap-3 p-3 rounded"
-                      style={{ border: "1px solid var(--border)", backgroundColor: "var(--bg)" }}
+                      style={{
+                        border: "1px solid var(--border)",
+                        backgroundColor: "var(--bg)",
+                      }}
                     >
                       <div
                         style={{
-                          width: "38px", height: "38px", borderRadius: "50%",
+                          width: "38px",
+                          height: "38px",
+                          borderRadius: "50%",
                           backgroundColor: "var(--light-green)",
-                          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
                         }}
                       >
                         <FaNewspaper size={14} color="var(--green)" />
                       </div>
                       <div>
-                        <small style={{ color: "var(--gray)", fontSize: "11px", fontWeight: "600" }}>TOTAL POSTS</small>
-                        <p className="mb-0 fw-semibold" style={{ fontSize: "14px" }}>{postCount} post{postCount !== 1 ? "s" : ""}</p>
+                        <small
+                          style={{
+                            color: "var(--gray)",
+                            fontSize: "11px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          TOTAL POSTS
+                        </small>
+                        <p
+                          className="mb-0 fw-semibold"
+                          style={{ fontSize: "14px" }}
+                        >
+                          {postCount} post{postCount !== 1 ? "s" : ""}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -364,9 +560,13 @@ const Settings = () => {
                   <button
                     onClick={() => setActiveTab("profile")}
                     className="btn fw-semibold mt-4"
-                    style={{ border: "1px solid var(--green)", color: "var(--green)", fontSize: "13px" }}
+                    style={{
+                      border: "1px solid var(--green)",
+                      color: "var(--green)",
+                      fontSize: "13px",
+                    }}
                   >
-                    ✏️ Edit Profile
+                    <FaPen size={14} /> Edit Profile
                   </button>
                 </>
               )}
@@ -375,61 +575,103 @@ const Settings = () => {
               {activeTab === "profile" && (
                 <>
                   <h6 className="fw-bold mb-1">Edit Profile</h6>
-                  <p style={{ color: "var(--gray)", fontSize: "13px" }} className="mb-4">
+                  <p
+                    style={{ color: "var(--gray)", fontSize: "13px" }}
+                    className="mb-4"
+                  >
                     Update your personal information.
                   </p>
-                  <form onSubmit={profileFormik.handleSubmit} style={{ maxWidth: "460px" }}>
+                  <form
+                    onSubmit={profileFormik.handleSubmit}
+                    style={{ maxWidth: "460px" }}
+                  >
                     <div className="mb-3">
-                      <label className="form-label fw-semibold" style={{ fontSize: "13px" }}>First Name</label>
+                      <label
+                        className="form-label fw-semibold"
+                        style={{ fontSize: "13px" }}
+                      >
+                        First Name
+                      </label>
                       <input
-                        type="text" name="firstName"
+                        type="text"
+                        name="firstName"
                         className={`form-control ${profileFormik.touched.firstName && profileFormik.errors.firstName ? "is-invalid" : ""}`}
                         value={profileFormik.values.firstName}
                         onChange={profileFormik.handleChange}
                         onBlur={profileFormik.handleBlur}
                         style={{ fontSize: "14px" }}
                       />
-                      {profileFormik.touched.firstName && profileFormik.errors.firstName && (
-                        <div className="invalid-feedback">{profileFormik.errors.firstName}</div>
-                      )}
+                      {profileFormik.touched.firstName &&
+                        profileFormik.errors.firstName && (
+                          <div className="invalid-feedback">
+                            {profileFormik.errors.firstName}
+                          </div>
+                        )}
                     </div>
                     <div className="mb-3">
-                      <label className="form-label fw-semibold" style={{ fontSize: "13px" }}>Last Name</label>
+                      <label
+                        className="form-label fw-semibold"
+                        style={{ fontSize: "13px" }}
+                      >
+                        Last Name
+                      </label>
                       <input
-                        type="text" name="lastName"
+                        type="text"
+                        name="lastName"
                         className={`form-control ${profileFormik.touched.lastName && profileFormik.errors.lastName ? "is-invalid" : ""}`}
                         value={profileFormik.values.lastName}
                         onChange={profileFormik.handleChange}
                         onBlur={profileFormik.handleBlur}
                         style={{ fontSize: "14px" }}
                       />
-                      {profileFormik.touched.lastName && profileFormik.errors.lastName && (
-                        <div className="invalid-feedback">{profileFormik.errors.lastName}</div>
-                      )}
+                      {profileFormik.touched.lastName &&
+                        profileFormik.errors.lastName && (
+                          <div className="invalid-feedback">
+                            {profileFormik.errors.lastName}
+                          </div>
+                        )}
                     </div>
                     <div className="mb-4">
-                      <label className="form-label fw-semibold" style={{ fontSize: "13px" }}>Email Address</label>
+                      <label
+                        className="form-label fw-semibold"
+                        style={{ fontSize: "13px" }}
+                      >
+                        Email Address
+                      </label>
                       <input
-                        type="email" name="email"
+                        type="email"
+                        name="email"
                         className={`form-control ${profileFormik.touched.email && profileFormik.errors.email ? "is-invalid" : ""}`}
                         value={profileFormik.values.email}
                         onChange={profileFormik.handleChange}
                         onBlur={profileFormik.handleBlur}
                         style={{ fontSize: "14px" }}
                       />
-                      {profileFormik.touched.email && profileFormik.errors.email && (
-                        <div className="invalid-feedback">{profileFormik.errors.email}</div>
-                      )}
+                      {profileFormik.touched.email &&
+                        profileFormik.errors.email && (
+                          <div className="invalid-feedback">
+                            {profileFormik.errors.email}
+                          </div>
+                        )}
                     </div>
                     <button
                       type="submit"
                       className="btn fw-bold px-4"
                       disabled={loadingProfile}
-                      style={{ backgroundColor: "var(--green)", color: "white", fontSize: "14px" }}
+                      style={{
+                        backgroundColor: "var(--green)",
+                        color: "white",
+                        fontSize: "14px",
+                      }}
                     >
-                      {loadingProfile
-                        ? <><span className="spinner-border spinner-border-sm me-2" />Saving...</>
-                        : "Save Changes"}
+                      {loadingProfile ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" />
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Changes"
+                      )}
                     </button>
                   </form>
                 </>
@@ -439,16 +681,29 @@ const Settings = () => {
               {activeTab === "password" && (
                 <>
                   <h6 className="fw-bold mb-1">Change Password</h6>
-                  <p style={{ color: "var(--gray)", fontSize: "13px", marginBottom: "20px" }}>
-                    We'll send an OTP to your email to verify it's you before changing your password.
+                  <p
+                    style={{
+                      color: "var(--gray)",
+                      fontSize: "13px",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    We'll send an OTP to your email to verify it's you before
+                    changing your password.
                   </p>
                   <div style={{ maxWidth: "460px" }}>
                     <div className="mb-3">
-                      <label style={labelStyle}>Step 1 — Verify your email</label>
+                      <label style={labelStyle}>
+                        Step 1 — Verify your email
+                      </label>
                       <div className="d-flex gap-2 align-items-center">
                         <input
                           type="text"
-                          style={{ ...inputStyle, backgroundColor: "#f9fafb", color: "var(--gray)" }}
+                          style={{
+                            ...inputStyle,
+                            backgroundColor: "#f9fafb",
+                            color: "var(--gray)",
+                          }}
                           value={user?.email}
                           disabled
                         />
@@ -457,20 +712,39 @@ const Settings = () => {
                           disabled={otpLoading || countdown > 0}
                           className="btn fw-semibold flex-shrink-0 d-flex align-items-center gap-2"
                           style={{
-                            backgroundColor: countdown > 0 ? "#f3f4f6" : "var(--green)",
+                            backgroundColor:
+                              countdown > 0 ? "#f3f4f6" : "var(--green)",
                             color: countdown > 0 ? "var(--gray)" : "white",
-                            fontSize: "13px", whiteSpace: "nowrap",
-                            padding: "10px 16px", borderRadius: "8px",
+                            fontSize: "13px",
+                            whiteSpace: "nowrap",
+                            padding: "10px 16px",
+                            borderRadius: "8px",
                           }}
                         >
-                          {otpLoading
-                            ? <><span className="spinner-border spinner-border-sm" /> Sending...</>
-                            : countdown > 0 ? `Resend in ${countdown}s`
-                            : <><FaPaperPlane size={12} /> {otpSent ? "Resend OTP" : "Send OTP"}</>}
+                          {otpLoading ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm" />{" "}
+                              Sending...
+                            </>
+                          ) : countdown > 0 ? (
+                            `Resend in ${countdown}s`
+                          ) : (
+                            <>
+                              <FaPaperPlane size={12} />{" "}
+                              {otpSent ? "Resend OTP" : "Send OTP"}
+                            </>
+                          )}
                         </button>
                       </div>
                       {otpSent && (
-                        <small style={{ color: "var(--green)", fontSize: "12px", marginTop: "4px", display: "block" }}>
+                        <small
+                          style={{
+                            color: "var(--green)",
+                            fontSize: "12px",
+                            marginTop: "4px",
+                            display: "block",
+                          }}
+                        >
                           ✓ OTP sent — check your inbox and spam folder
                         </small>
                       )}
@@ -481,10 +755,17 @@ const Settings = () => {
                         <div className="mb-3">
                           <label style={labelStyle}>Step 2 — Enter OTP</label>
                           <input
-                            type="text" style={inputStyle}
-                            placeholder="Enter 6-digit OTP" maxLength={6}
+                            type="text"
+                            style={inputStyle}
+                            placeholder="Enter 6-digit OTP"
+                            maxLength={6}
                             value={passwordForm.otp}
-                            onChange={(e) => setPasswordForm({ ...passwordForm, otp: e.target.value })}
+                            onChange={(e) =>
+                              setPasswordForm({
+                                ...passwordForm,
+                                otp: e.target.value,
+                              })
+                            }
                           />
                         </div>
                         <div className="mb-3">
@@ -495,14 +776,37 @@ const Settings = () => {
                               style={{ ...inputStyle, paddingRight: "40px" }}
                               placeholder="Enter current password"
                               value={passwordForm.currentPassword}
-                              onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                              onChange={(e) =>
+                                setPasswordForm({
+                                  ...passwordForm,
+                                  currentPassword: e.target.value,
+                                })
+                              }
                             />
                             <button
                               type="button"
-                              onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}
-                              style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--gray)", cursor: "pointer" }}
+                              onClick={() =>
+                                setShowPasswords({
+                                  ...showPasswords,
+                                  current: !showPasswords.current,
+                                })
+                              }
+                              style={{
+                                position: "absolute",
+                                right: "12px",
+                                top: "50%",
+                                transform: "translateY(-50%)",
+                                background: "none",
+                                border: "none",
+                                color: "var(--gray)",
+                                cursor: "pointer",
+                              }}
                             >
-                              {showPasswords.current ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+                              {showPasswords.current ? (
+                                <FaEyeSlash size={14} />
+                              ) : (
+                                <FaEye size={14} />
+                              )}
                             </button>
                           </div>
                         </div>
@@ -514,14 +818,37 @@ const Settings = () => {
                               style={{ ...inputStyle, paddingRight: "40px" }}
                               placeholder="At least 6 characters"
                               value={passwordForm.newPassword}
-                              onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                              onChange={(e) =>
+                                setPasswordForm({
+                                  ...passwordForm,
+                                  newPassword: e.target.value,
+                                })
+                              }
                             />
                             <button
                               type="button"
-                              onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}
-                              style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--gray)", cursor: "pointer" }}
+                              onClick={() =>
+                                setShowPasswords({
+                                  ...showPasswords,
+                                  new: !showPasswords.new,
+                                })
+                              }
+                              style={{
+                                position: "absolute",
+                                right: "12px",
+                                top: "50%",
+                                transform: "translateY(-50%)",
+                                background: "none",
+                                border: "none",
+                                color: "var(--gray)",
+                                cursor: "pointer",
+                              }}
                             >
-                              {showPasswords.new ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+                              {showPasswords.new ? (
+                                <FaEyeSlash size={14} />
+                              ) : (
+                                <FaEye size={14} />
+                              )}
                             </button>
                           </div>
                         </div>
@@ -533,14 +860,37 @@ const Settings = () => {
                               style={{ ...inputStyle, paddingRight: "40px" }}
                               placeholder="Confirm new password"
                               value={passwordForm.confirmNewPassword}
-                              onChange={(e) => setPasswordForm({ ...passwordForm, confirmNewPassword: e.target.value })}
+                              onChange={(e) =>
+                                setPasswordForm({
+                                  ...passwordForm,
+                                  confirmNewPassword: e.target.value,
+                                })
+                              }
                             />
                             <button
                               type="button"
-                              onClick={() => setShowPasswords({ ...showPasswords, confirm: !showPasswords.confirm })}
-                              style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--gray)", cursor: "pointer" }}
+                              onClick={() =>
+                                setShowPasswords({
+                                  ...showPasswords,
+                                  confirm: !showPasswords.confirm,
+                                })
+                              }
+                              style={{
+                                position: "absolute",
+                                right: "12px",
+                                top: "50%",
+                                transform: "translateY(-50%)",
+                                background: "none",
+                                border: "none",
+                                color: "var(--gray)",
+                                cursor: "pointer",
+                              }}
                             >
-                              {showPasswords.confirm ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+                              {showPasswords.confirm ? (
+                                <FaEyeSlash size={14} />
+                              ) : (
+                                <FaEye size={14} />
+                              )}
                             </button>
                           </div>
                         </div>
@@ -548,11 +898,22 @@ const Settings = () => {
                           onClick={handlePasswordSubmit}
                           disabled={loadingPassword}
                           className="btn fw-bold w-100"
-                          style={{ backgroundColor: "var(--green)", color: "white", fontSize: "14px", padding: "12px", borderRadius: "8px" }}
+                          style={{
+                            backgroundColor: "var(--green)",
+                            color: "white",
+                            fontSize: "14px",
+                            padding: "12px",
+                            borderRadius: "8px",
+                          }}
                         >
-                          {loadingPassword
-                            ? <><span className="spinner-border spinner-border-sm me-2" />Changing Password...</>
-                            : "Change Password"}
+                          {loadingPassword ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-2" />
+                              Changing Password...
+                            </>
+                          ) : (
+                            "Change Password"
+                          )}
                         </button>
                       </>
                     )}
@@ -563,17 +924,33 @@ const Settings = () => {
               {/* ── DELETE ACCOUNT ── */}
               {activeTab === "delete" && (
                 <>
-                  <h6 className="fw-bold mb-1" style={{ color: "#dc2626" }}>Delete Account</h6>
-                  <p style={{ color: "var(--gray)", fontSize: "13px" }} className="mb-3">
-                    This permanently deletes your account and all your posts. This cannot be undone.
+                  <h6 className="fw-bold mb-1" style={{ color: "#dc2626" }}>
+                    Delete Account
+                  </h6>
+                  <p
+                    style={{ color: "var(--gray)", fontSize: "13px" }}
+                    className="mb-3"
+                  >
+                    This permanently deletes your account and all your posts.
+                    This cannot be undone.
                   </p>
                   <div
                     className="rounded p-3 mb-4"
-                    style={{ backgroundColor: "#fff5f5", border: "1px solid #fecaca", fontSize: "13px", color: "#dc2626" }}
+                    style={{
+                      backgroundColor: "#fff5f5",
+                      border: "1px solid #fecaca",
+                      fontSize: "13px",
+                      color: "#dc2626",
+                    }}
                   >
-                    <FiAlertTriangle /> You are about to delete <strong>{user?.firstName || "your account"}</strong>. All your posts will also be permanently removed.
+                    <FiAlertTriangle /> You are about to delete{" "}
+                    <strong>{user?.firstName || "your account"}</strong>. All
+                    your posts will also be permanently removed.
                   </div>
-                  <form onSubmit={deleteFormik.handleSubmit} style={{ maxWidth: "460px" }}>
+                  <form
+                    onSubmit={deleteFormik.handleSubmit}
+                    style={{ maxWidth: "460px" }}
+                  >
                     <PasswordField
                       label="Enter your password to confirm"
                       name="password"
@@ -586,16 +963,24 @@ const Settings = () => {
                       type="submit"
                       className="btn fw-bold px-4"
                       disabled={loadingDelete}
-                      style={{ backgroundColor: "#dc2626", color: "white", fontSize: "14px" }}
+                      style={{
+                        backgroundColor: "#dc2626",
+                        color: "white",
+                        fontSize: "14px",
+                      }}
                     >
-                      {loadingDelete
-                        ? <><span className="spinner-border spinner-border-sm me-2" />Deleting...</>
-                        : "Yes, Delete My Account"}
+                      {loadingDelete ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" />
+                          Deleting...
+                        </>
+                      ) : (
+                        "Yes, Delete My Account"
+                      )}
                     </button>
                   </form>
                 </>
               )}
-
             </div>
           </div>
         </div>
