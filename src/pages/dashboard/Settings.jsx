@@ -17,6 +17,7 @@ import {
   FaShieldAlt,
   FaNewspaper,
   FaPen,
+  FaUserShield,
 } from "react-icons/fa";
 import API from "../../api/axios";
 import MessageToast from "../../components/ui/MessageToast";
@@ -31,7 +32,7 @@ const Settings = () => {
   const { user } = useSelector((state) => state.auth);
 
   console.log(user);
-  
+
   const [activeTab, setActiveTab] = useState("myprofile");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
@@ -342,13 +343,13 @@ const Settings = () => {
                       }}
                     >
                       {user?.roles === "admin" ? (
-                        <div>
-                          <BiStar size={12} color="gold" /> Admin
-                        </div>
+                        <span>
+                          <FaUserShield size={14} color="gold" fill="gold" /> Admin
+                        </span>
                       ) : (
-                        <div>
-                          <BiUserCheck size={12} /> User
-                        </div>
+                          <span>
+                            <BiUserCheck size={14} color="var(--green)"/> User
+                          </span>
                       )}
                     </span>
                   </div>
@@ -566,7 +567,10 @@ const Settings = () => {
                       fontSize: "13px",
                     }}
                   >
-                    <FaPen size={14} /> Edit Profile
+                    <div className="d-flex align-items-center gap-2">
+                      <FaPen size={12} />
+                      <span>Edit Profile</span>
+                    </div>
                   </button>
                 </>
               )}
