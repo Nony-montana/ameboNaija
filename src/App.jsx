@@ -27,6 +27,7 @@ import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import AdminComments from "./pages/dashboard/AdminComment";
 import AuthorProfile from "./pages/AuthorPage";
 import Bookmarks from "./pages/dashboard/Bookmarks";
+import Notifications from "./pages/dashboard/NotificationsPage";
 
 // import { setUser, logout } from "./store/slices/authSlice";
 // import API from "./api/axios";
@@ -82,7 +83,6 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/author/:id" element={<AuthorProfile />} />
-          <Route path="/dashboard/bookmarks" element={<Bookmarks />} />
 
           {/* Dashboard Routes (protected) */}
           <Route path="/dashboard" element={<Dashboard />} />
@@ -92,6 +92,8 @@ function App() {
           <Route path="/dashboard/edit/:slug" element={<EditPost />} />
           <Route path="/dashboard/preview/:slug" element={<PreviewPost />} />
           <Route path="/dashboard/settings" element={<Settings />} />
+          <Route path="/dashboard/bookmarks" element={<Bookmarks />} />
+          <Route path="/dashboard/notifications" element={<Notifications />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/overview" element={<AdminOverview />} />
           <Route path="/admin/posts" element={<AdminPosts />} />

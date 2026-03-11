@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import API from "../api/axios";
 import { FaBell } from "react-icons/fa";
 
@@ -39,9 +40,7 @@ const NotificationBell = () => {
   const handleMarkAsRead = async (id) => {
     try {
       await API.put(`/notifications/${id}/read`);
-      setNotifications(notifications.map((n) =>
-        n._id === id ? { ...n, isRead: true } : n
-      ));
+      setNotifications(notifications.map((n) => (n._id === id ? { ...n, isRead: true } : n)));
     } catch (err) {
       console.log(err);
     }
@@ -56,23 +55,19 @@ const NotificationBell = () => {
     }
   };
 
-  const formattedTime =(createdAt)=>{
-    const today = new Date()
-    const pastDay = new Date(createdAt) 
-
-    const seconds = Math.floor((today-pastDay)/1000)
-
-    if(seconds<60) return "Just now"
-
-    const minutes = Math.floor(seconds/60);
-    if(minutes<60) return `${minutes} min(s) ago`;
-
-    const hours = Math.floor(minutes/60);
-    if(hours<24) return `${hours} hr(s) ago`;
-
-    const days = Math.floor(hours/24)
-    return  `${days} day(s) ago`
-  }
+  const formattedDate = (createdAt) => {
+    const today = new Date();
+    const pastDay = new Date(createdAt);
+    const seconds = Math.floor((today - pastDay) / 1000);
+    if (seconds < 60) return "Just now";
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} minute(s) ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hour(s) ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days} day(s) ago`;
+    return pastDay.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  };
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
@@ -122,7 +117,12 @@ const NotificationBell = () => {
             className="d-flex align-items-center justify-content-between px-3 py-2"
             style={{ borderBottom: "1px solid var(--border)" }}
           >
-            <span className="fw-bold" style={{ fontSize: "14px" }}>Notifications</span>
+            <span className="fw-bold" style={{ fontSize: "14px" }}>
+              Notifications{" "}
+              {unreadCount > 0 && (
+                <span style={{ color: "#dc2626", fontSize: "12px" }}>({unreadCount})</span>
+              )}
+            </span>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
@@ -134,8 +134,8 @@ const NotificationBell = () => {
             )}
           </div>
 
-          {/* LIST */}
-          <div style={{ maxHeight: "360px", overflowY: "auto" }}>
+          {/* LIST — 5 most recent */}
+          <div style={{ maxHeight: "320px", overflowY: "auto" }}>
             {notifications.length === 0 ? (
               <div className="text-center py-4">
                 <FaBell size={24} color="var(--gray)" />
@@ -149,14 +149,17 @@ const NotificationBell = () => {
                   key={n._id}
                   onClick={() => handleMarkAsRead(n._id)}
                   style={{
-                    padding: "12px 16px",
+                    padding: "10px 16px",
                     borderBottom: "1px solid var(--border)",
                     backgroundColor: n.isRead ? "white" : "#f0fdf4",
                     cursor: "pointer",
                     transition: "background 0.2s",
                   }}
                 >
-                  <p className="mb-0" style={{ fontSize: "13px", color: "var(--text)", fontWeight: n.isRead ? "400" : "600" }}>
+                  <p
+                    className="mb-0"
+                    style={{ fontSize: "13px", color: "var(--text)", fontWeight: n.isRead ? "400" : "600" }}
+                  >
                     {n.message}
                   </p>
                   {n.postTitle && (
@@ -166,11 +169,22 @@ const NotificationBell = () => {
                   )}
                   <br />
                   <small style={{ color: "var(--gray)", fontSize: "11px" }}>
-                    {formattedTime(n.createdAt).toLocaleString("en-NG")}
+                    {formattedDate(n.createdAt)}
                   </small>
                 </div>
               ))
             )}
+          </div>
+
+          {/* FOOTER */}
+          <div style={{ borderTop: "1px solid var(--border)", padding: "10px 16px", textAlign: "center" }}>
+            <Link
+              to="/dashboard/notifications"
+              onClick={() => setOpen(false)}
+              style={{ fontSize: "13px", color: "var(--green)", fontWeight: "600", textDecoration: "none" }}
+            >
+              See all notifications →
+            </Link>
           </div>
         </div>
       )}
