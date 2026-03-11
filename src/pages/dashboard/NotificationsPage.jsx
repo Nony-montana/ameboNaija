@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import API from "../../api/axios";
 import Spinner from "../../components/Spinner";
-import { FaBell, FaEllipsisV, FaTrash } from "react-icons/fa";
+import { FaBell, FaEllipsisH, FaTrash } from "react-icons/fa";
 import { BsCheckAll } from "react-icons/bs";
 import MessageToast from "../../components/ui/MessageToast";
 
@@ -24,7 +24,7 @@ const Notifications = () => {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const res = await API.get("/notifications/all");
+      const res = await API.get("/notifications");
       setNotifications(res.data.data);
     } catch (err) {
       showMessage("Failed to fetch notifications", "error");
@@ -250,7 +250,7 @@ const Notifications = () => {
                     className="btn btn-sm"
                     style={{ color: "var(--gray)", padding: "4px 8px" }}
                   >
-                    <FaEllipsisV size={13} />
+                    <FaEllipsisH size={13} />
                   </button>
 
                   {openMenu === n._id && (
