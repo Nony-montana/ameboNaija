@@ -167,7 +167,7 @@ const CreatePost = () => {
                                     style={{ fontSize: "14px" }}
                                 >
                                     <option value="">Select a category</option>
-                                    {["news", "gist", "gossip", "entertainment", "lifestyle", "sports"].map((cat) => (
+                                    {["news", "gist", "gossip", "entertainment", "lifestyle", "sports","tech"].map((cat) => (
                                         <option key={cat} value={cat}>
                                             {cat.charAt(0).toUpperCase() + cat.slice(1)}
                                         </option>

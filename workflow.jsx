@@ -64,7 +64,7 @@
 // Post views — you track views but need to make sure it only counts unique views, not every refresh ✅
 
 // Nice to Have:
-// 11. Comment likes/unlikes — like/unlike individual comments
+// 11. Comment likes/unlikes — like/unlike individual comments ✅
 // 12. Search page — dedicated search results page ✅
 // 13. Dark mode — you have CSS variables set up already, halfway there
 // 14. Rate limiting on backend — prevent spam/abuse
@@ -77,3 +77,4 @@
 //admin to receive email when there is a new pending post
 //tech- category
 //everyone should reply to comment
+//like comment notifications

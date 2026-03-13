@@ -15,7 +15,7 @@ const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const location = useLocation();
 
-  const tabs = ["news", "gist", "gossip", "entertainment", "lifestyle", "sports"];
+  const tabs = ["news", "gist", "gossip", "entertainment", "lifestyle", "sports","tech"];
   const activeTab = location.pathname.split("/category/")[1] || "";
 
   const handleLogout = () => {

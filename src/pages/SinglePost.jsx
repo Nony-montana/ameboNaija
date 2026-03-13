@@ -314,7 +314,7 @@ const SinglePost = () => {
                   Browse Categories
                 </h6>
                 <div className="d-flex flex-wrap gap-2">
-                  {["news", "gist", "gossip", "entertainment", "lifestyle", "sports"].map((cat) => (
+                  {["news", "gist", "gossip", "entertainment", "lifestyle", "sports","tech"].map((cat) => (
                     <Link
                       key={cat}
                       to={`/category/${cat}`}

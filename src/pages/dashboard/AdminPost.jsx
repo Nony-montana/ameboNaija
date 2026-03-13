@@ -10,7 +10,7 @@ import {
 import { TbTrash } from "react-icons/tb";
 import { BiInfoCircle, BiShare } from "react-icons/bi";
 
-const CATEGORIES = ["", "news", "gist", "gossip", "entertainment", "lifestyle", "sports"];
+const CATEGORIES = ["", "news", "gist", "gossip", "entertainment", "lifestyle", "sports","tech"];
 const STATUSES = ["", "draft", "pending", "published", "rejected"];
 
 const AdminPosts = () => {
