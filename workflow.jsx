@@ -75,6 +75,6 @@
 //member since - update
 //username/profile picture
 //admin to receive email when there is a new pending post
-//tech- category
+//tech- category✅
 //everyone should reply to comment
-//like comment notifications
+//like comment notifications ✅

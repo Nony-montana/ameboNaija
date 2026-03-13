@@ -51,7 +51,7 @@ const Footer = () => {
                             Categories
                         </h6>
                         <ul className="list-unstyled">
-                            {["news", "gist", "gossip", "entertainment", "lifestyle","sport","tech"].map((cat) => (
+                            {["news", "gist", "gossip", "entertainment", "lifestyle","sports","tech"].map((cat) => (
                                 <li key={cat} className="mb-2">
                                     <Link
                                         to={`/category/${cat}`}
