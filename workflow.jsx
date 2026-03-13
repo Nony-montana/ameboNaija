@@ -70,3 +70,10 @@
 // 14. Rate limiting on backend — prevent spam/abuse
 //share ✅
 //user profile ✅
+//user management - view user's profile 
+//delete notification modal 
+//member since - update
+//username/profile picture
+//admin to receive email when there is a new pending post
+//tech- category
+//everyone should reply to comment
