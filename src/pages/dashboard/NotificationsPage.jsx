@@ -13,6 +13,12 @@ const Notifications = () => {
   const [openMenu, setOpenMenu] = useState(null);
   const menuRef = useRef(null);
 
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState(""); // "single" or "all"
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const showMessage = (msg, type) => {
@@ -77,24 +83,39 @@ const Notifications = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await API.delete(`/notifications/${id}`);
-      setNotifications(notifications.filter((n) => n._id !== id));
-      setOpenMenu(null);
-      showMessage("Notification deleted", "success");
-    } catch (err) {
-      showMessage("Failed to delete notification", "error");
-    }
+  // Open modal for single delete
+  const confirmDelete = (id) => {
+    setDeleteTargetId(id);
+    setModalType("single");
+    setOpenMenu(null);
+    setShowModal(true);
   };
 
-  const handleDeleteAll = async () => {
+  // Open modal for clear all
+  const confirmDeleteAll = () => {
+    setModalType("all");
+    setShowModal(true);
+  };
+
+  // Execute delete after confirmation
+  const handleConfirm = async () => {
+    setDeleteLoading(true);
     try {
-      await API.delete("/notifications/all");
-      setNotifications([]);
-      showMessage("All notifications deleted", "success");
+      if (modalType === "single") {
+        await API.delete(`/notifications/${deleteTargetId}`);
+        setNotifications(notifications.filter((n) => n._id !== deleteTargetId));
+        showMessage("Notification deleted", "success");
+      } else {
+        await API.delete("/notifications/all");
+        setNotifications([]);
+        showMessage("All notifications deleted", "success");
+      }
     } catch (err) {
-      showMessage("Failed to delete all notifications", "error");
+      showMessage("Failed to delete notification(s)", "error");
+    } finally {
+      setDeleteLoading(false);
+      setShowModal(false);
+      setDeleteTargetId(null);
     }
   };
 
@@ -155,7 +176,7 @@ const Notifications = () => {
             )}
             {notifications.length > 0 && (
               <button
-                onClick={handleDeleteAll}
+                onClick={confirmDeleteAll}
                 className="btn btn-sm fw-semibold d-flex align-items-center gap-1"
                 style={{ border: "1px solid #dc2626", color: "#dc2626", fontSize: "13px" }}
               >
@@ -262,7 +283,7 @@ const Notifications = () => {
                         </button>
                       )}
                       <button
-                        onClick={() => handleDelete(n._id)}
+                        onClick={() => confirmDelete(n._id)}
                         className="btn btn-sm w-100 text-start"
                         style={{ padding: "8px 14px", fontSize: "13px", color: "#dc2626" }}
                       >
@@ -276,6 +297,76 @@ const Notifications = () => {
           })}
         </div>
       </div>
+
+      {/* CONFIRMATION MODAL */}
+      {showModal && (
+        <div
+          style={{
+            position: "fixed", inset: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            zIndex: 9999,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: "16px",
+          }}
+          onClick={() => !deleteLoading && setShowModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              borderRadius: "12px",
+              padding: "28px 24px",
+              width: "100%",
+              maxWidth: "400px",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* ICON */}
+            <div
+              className="d-flex align-items-center justify-content-center mx-auto mb-3"
+              style={{
+                width: "52px", height: "52px", borderRadius: "50%",
+                backgroundColor: "#fff5f5",
+              }}
+            >
+              <FaTrash size={20} color="#dc2626" />
+            </div>
+
+            {/* TEXT */}
+            <h6 className="fw-bold text-center mb-2" style={{ fontSize: "16px" }}>
+              {modalType === "all" ? "Clear all notifications?" : "Delete this notification?"}
+            </h6>
+            <p className="text-center mb-4" style={{ color: "var(--gray)", fontSize: "13px" }}>
+              {modalType === "all"
+                ? "This will permanently delete all your notifications. This cannot be undone."
+                : "This notification will be permanently deleted. This cannot be undone."}
+            </p>
+
+            {/* BUTTONS */}
+            <div className="d-flex gap-2">
+              <button
+                onClick={() => setShowModal(false)}
+                disabled={deleteLoading}
+                className="btn fw-semibold w-50"
+                style={{ border: "1px solid var(--border)", color: "var(--gray)", fontSize: "14px" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirm}
+                disabled={deleteLoading}
+                className="btn fw-bold w-50"
+                style={{ backgroundColor: "#dc2626", color: "white", fontSize: "14px" }}
+              >
+                {deleteLoading
+                  ? <><span className="spinner-border spinner-border-sm me-2" />Deleting...</>
+                  : "Yes, Delete"
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
