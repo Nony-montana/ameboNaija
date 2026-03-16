@@ -74,7 +74,8 @@
 //delete notification modal 
 //member since - update
 //username/profile picture
-//admin to receive email when there is a new pending post
+//admin to receive email when there is a new pending post ✅
 //tech- category✅
 //everyone should reply to comment
 //like comment notifications ✅
+//notification reponsiveness

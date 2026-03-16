@@ -266,7 +266,7 @@ const Notifications = () => {
                       fontWeight: n.isRead ? "400" : "600",
                     }}
                   >
-                    {n.message}
+                   {n.sender?.firstName} {n.sender?.lastName} {n.message}
                   </p>
                   {n.postTitle && (
                     <small style={{ color: "var(--gray)", fontSize: "12px" }}>

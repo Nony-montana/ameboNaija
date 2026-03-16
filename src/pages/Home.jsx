@@ -313,7 +313,7 @@ const Home = () => {
                   <h6 className="fw-bold mb-0">Browse Categories</h6>
                 </div>
                 <div className="d-flex flex-wrap gap-2">
-                  {["news", "gist", "gossip", "entertainment", "lifestyle", "sports"].map((cat) => (
+                  {["news", "gist", "gossip", "entertainment", "lifestyle", "sports","tech"].map((cat) => (
                     <Link
                       key={cat}
                       to={`/category/${cat}`}
