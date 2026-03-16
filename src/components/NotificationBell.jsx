@@ -71,6 +71,13 @@ const NotificationBell = () => {
     });
   };
 
+  const getNotificationText = (n) => {
+    if (n.type === "approved" || n.type === "rejected") {
+      return n.message;
+    }
+    return `${n.sender?.firstName} ${n.sender?.lastName} ${n.message}`;
+  };
+
   const isMobile = window.innerWidth < 768;
 
   return (
@@ -120,7 +127,6 @@ const NotificationBell = () => {
           <div
             style={{
               position: "fixed",
-              // Mobile — slides up from bottom like a sheet
               ...(isMobile ? {
                 bottom: 0,
                 left: 0,
@@ -128,7 +134,6 @@ const NotificationBell = () => {
                 width: "100%",
                 borderRadius: "20px 20px 0 0",
               } : {
-                // Desktop — drops down from bell
                 top: "60px",
                 right: "0",
                 width: "320px",
@@ -207,7 +212,7 @@ const NotificationBell = () => {
                         fontWeight: n.isRead ? "400" : "600",
                       }}
                     >
-                      {n.sender?.firstName} {n.sender?.lastName} {n.message}
+                      {getNotificationText(n)}
                     </p>
                     {n.postTitle && (
                       <small style={{ color: "var(--gray)", fontSize: "11px" }}>
