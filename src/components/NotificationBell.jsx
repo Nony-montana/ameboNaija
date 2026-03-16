@@ -66,8 +66,12 @@ const NotificationBell = () => {
     if (hours < 24) return `${hours} hour(s) ago`;
     const days = Math.floor(hours / 24);
     if (days < 7) return `${days} day(s) ago`;
-    return pastDay.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+    return pastDay.toLocaleDateString(undefined, {
+      month: "short", day: "numeric", year: "numeric",
+    });
   };
+
+  const isMobile = window.innerWidth < 768;
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
@@ -99,94 +103,150 @@ const NotificationBell = () => {
 
       {/* DROPDOWN */}
       {open && (
-        <div
-          style={{
-            position: "absolute",
-            top: "42px", right: "0",
-            width: "320px",
-            backgroundColor: "white",
-            borderRadius: "12px",
-            boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-            border: "1px solid var(--border)",
-            zIndex: 9999,
-            overflow: "hidden",
-          }}
-        >
-          {/* HEADER */}
-          <div
-            className="d-flex align-items-center justify-content-between px-3 py-2"
-            style={{ borderBottom: "1px solid var(--border)" }}
-          >
-            <span className="fw-bold" style={{ fontSize: "14px" }}>
-              Notifications{" "}
-              {unreadCount > 0 && (
-                <span style={{ color: "#dc2626", fontSize: "12px" }}>({unreadCount})</span>
-              )}
-            </span>
-            {unreadCount > 0 && (
-              <button
-                onClick={handleMarkAllRead}
-                className="btn btn-sm"
-                style={{ fontSize: "11px", color: "var(--green)", padding: "2px 6px" }}
-              >
-                Mark all read
-              </button>
-            )}
-          </div>
-
-          {/* LIST — 5 most recent */}
-          <div style={{ maxHeight: "320px", overflowY: "auto" }}>
-            {notifications.length === 0 ? (
-              <div className="text-center py-4">
-                <FaBell size={24} color="var(--gray)" />
-                <p style={{ fontSize: "13px", color: "var(--gray)", marginTop: "8px" }}>
-                  No notifications yet
-                </p>
-              </div>
-            ) : (
-              notifications.map((n) => (
-                <div
-                  key={n._id}
-                  onClick={() => handleMarkAsRead(n._id)}
-                  style={{
-                    padding: "10px 16px",
-                    borderBottom: "1px solid var(--border)",
-                    backgroundColor: n.isRead ? "white" : "#f0fdf4",
-                    cursor: "pointer",
-                    transition: "background 0.2s",
-                  }}
-                >
-                  <p
-                    className="mb-0"
-                    style={{ fontSize: "13px", color: "var(--text)", fontWeight: n.isRead ? "400" : "600" }}
-                  >
-                   {n.sender?.firstName} {n.sender?.lastName} {n.message}
-                  </p>
-                  {n.postTitle && (
-                    <small style={{ color: "var(--gray)", fontSize: "11px" }}>
-                      {n.postTitle}
-                    </small>
-                  )}
-                  <br />
-                  <small style={{ color: "var(--gray)", fontSize: "11px" }}>
-                    {formattedDate(n.createdAt)}
-                  </small>
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* FOOTER */}
-          <div style={{ borderTop: "1px solid var(--border)", padding: "10px 16px", textAlign: "center" }}>
-            <Link
-              to="/dashboard/notifications"
+        <>
+          {/* BACKDROP — mobile only */}
+          {isMobile && (
+            <div
               onClick={() => setOpen(false)}
-              style={{ fontSize: "13px", color: "var(--green)", fontWeight: "600", textDecoration: "none" }}
+              style={{
+                position: "fixed",
+                inset: 0,
+                backgroundColor: "rgba(0,0,0,0.4)",
+                zIndex: 9998,
+              }}
+            />
+          )}
+
+          <div
+            style={{
+              position: "fixed",
+              // Mobile — slides up from bottom like a sheet
+              ...(isMobile ? {
+                bottom: 0,
+                left: 0,
+                right: 0,
+                width: "100%",
+                borderRadius: "20px 20px 0 0",
+              } : {
+                // Desktop — drops down from bell
+                top: "60px",
+                right: "0",
+                width: "320px",
+                borderRadius: "12px",
+              }),
+              backgroundColor: "white",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+              border: "1px solid var(--border)",
+              zIndex: 9999,
+              overflow: "hidden",
+            }}
+          >
+            {/* DRAG HANDLE — mobile only */}
+            {isMobile && (
+              <div style={{ textAlign: "center", padding: "10px 0 4px" }}>
+                <div
+                  style={{
+                    width: "40px", height: "4px",
+                    backgroundColor: "var(--border)",
+                    borderRadius: "2px",
+                    display: "inline-block",
+                  }}
+                />
+              </div>
+            )}
+
+            {/* HEADER */}
+            <div
+              className="d-flex align-items-center justify-content-between px-3 py-2"
+              style={{ borderBottom: "1px solid var(--border)" }}
             >
-              See all notifications →
-            </Link>
+              <span className="fw-bold" style={{ fontSize: "14px" }}>
+                Notifications{" "}
+                {unreadCount > 0 && (
+                  <span style={{ color: "#dc2626", fontSize: "12px" }}>({unreadCount})</span>
+                )}
+              </span>
+              {unreadCount > 0 && (
+                <button
+                  onClick={handleMarkAllRead}
+                  className="btn btn-sm"
+                  style={{ fontSize: "11px", color: "var(--green)", padding: "2px 6px" }}
+                >
+                  Mark all read
+                </button>
+              )}
+            </div>
+
+            {/* LIST */}
+            <div style={{ maxHeight: isMobile ? "60vh" : "320px", overflowY: "auto" }}>
+              {notifications.length === 0 ? (
+                <div className="text-center py-4">
+                  <FaBell size={24} color="var(--gray)" />
+                  <p style={{ fontSize: "13px", color: "var(--gray)", marginTop: "8px" }}>
+                    No notifications yet
+                  </p>
+                </div>
+              ) : (
+                notifications.map((n) => (
+                  <div
+                    key={n._id}
+                    onClick={() => handleMarkAsRead(n._id)}
+                    style={{
+                      padding: "10px 16px",
+                      borderBottom: "1px solid var(--border)",
+                      backgroundColor: n.isRead ? "white" : "#f0fdf4",
+                      cursor: "pointer",
+                      transition: "background 0.2s",
+                    }}
+                  >
+                    <p
+                      className="mb-0"
+                      style={{
+                        fontSize: "13px",
+                        color: "var(--text)",
+                        fontWeight: n.isRead ? "400" : "600",
+                      }}
+                    >
+                      {n.sender?.firstName} {n.sender?.lastName} {n.message}
+                    </p>
+                    {n.postTitle && (
+                      <small style={{ color: "var(--gray)", fontSize: "11px" }}>
+                        {n.postTitle}
+                      </small>
+                    )}
+                    <br />
+                    <small style={{ color: "var(--gray)", fontSize: "11px" }}>
+                      {formattedDate(n.createdAt)}
+                    </small>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* FOOTER */}
+            <div
+              style={{
+                borderTop: "1px solid var(--border)",
+                padding: "10px 16px",
+                textAlign: "center",
+                paddingBottom: isMobile ? "24px" : "10px",
+              }}
+            >
+              <Link
+                to="/dashboard/notifications"
+                onClick={() => setOpen(false)}
+                style={{
+                  fontSize: "13px",
+                  color: "var(--green)",
+                  fontWeight: "600",
+                  textDecoration: "none",
+                }}
+              >
+                See all notifications →
+              </Link>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
