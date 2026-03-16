@@ -65,7 +65,7 @@ const AdminOverview = () => {
             <div className="container py-5">
 
                 {/* HEADER */}
-                <div className="d-flex align-items-center justify-content-between mb-4">
+                <div className="d-flex align-items-center justify-content-between mb-4 flex-wrap">
                     <div>
                         <h4 className="fw-bold mb-0 d-flex align-items-center gap-2">
                             <MdDashboard color="var(--green)" /> Admin Overview
