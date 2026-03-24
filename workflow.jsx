@@ -71,7 +71,7 @@
 //share ✅
 //user profile ✅
 //user management - view user's profile 
-//delete notification modal 
+//delete notification modal  ✅
 //member since - update
 //username/profile picture
 //admin to receive email when there is a new pending post ✅
