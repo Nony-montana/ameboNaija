@@ -7,7 +7,7 @@ const PostContent = ({ post }) => {
           <img
             src={post.image}
             alt={post.title}
-            style={{ width: "100%", maxHeight: "450px", objectFit: "contain" }}
+            style={{ width: "100%", maxHeight: "450px", objectFit: "cover" }}
           />
         </div>
       )}
